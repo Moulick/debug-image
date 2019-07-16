@@ -12,5 +12,6 @@ CMD ["/sbin/my_init"]
 
 # Clean up APT when done.
 RUN apt-get update && \
+    apt-get upgrade && \
     apt-get install -y postgresql-client netcat telnet dnsutils curl && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
