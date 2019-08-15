@@ -4,6 +4,8 @@
 # https://github.com/phusion/baseimage-docker/blob/master/Changelog.md
 # for a list of version numbers.
 FROM ubuntu:latest
+ENV docker_url=https://download.docker.com/linux/static/stable/x86_64
+ENV docker_version=19.03.1
 
 LABEL Maintainer="Moulick Aggarwal" Email="moulickaggarwal@gmail.com"
 
@@ -30,4 +32,5 @@ RUN apt-get update && \
     mongodb-org-tools \
     yq \
     && \
-    apt-get clean && rm -rf /tmp/* /var/tmp/* /var/lib/apt/lists/*
+    apt-get clean && rm -rf /tmp/* /var/tmp/* /var/lib/apt/lists/* \
+    && curl -fsSL $docker_url/docker-$docker_version.tgz | tar zxvf - --strip 1 -C /usr/bin docker/docker
