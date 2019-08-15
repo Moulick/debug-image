@@ -1,8 +1,3 @@
-# Use phusion/baseimage as base image. To make your builds
-# reproducible, make sure you lock down to a specific version, not
-# to `latest`! See
-# https://github.com/phusion/baseimage-docker/blob/master/Changelog.md
-# for a list of version numbers.
 FROM ubuntu:latest
 ENV docker_url=https://download.docker.com/linux/static/stable/x86_64
 ENV docker_version=19.03.1
