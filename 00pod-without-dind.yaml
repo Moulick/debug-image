@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: moulick-debug
+  labels:
+    name: moulick-debug
+spec:
+  containers:
+    - name: debug
+      image: moulick/debug-image:v2.3
+      imagePullPolicy: Always
+      resources:
+        limits:
+          cpu: 2G
+          memory: 2Gi
+        requests:
+          cpu: 100m
+          memory: 100Mi
+      args:
+        - /bin/sh
+        - -c
+        - sleep 100000000
+      volumeMounts:
+        - mountPath: /var/run/docker.sock
+          name: docker-socket-volume
+      securityContext:
+        privileged: true
+  volumes:
+    - name: docker-socket-volume
+      hostPath:
+        path: /var/run/docker.sock
+        type: File
