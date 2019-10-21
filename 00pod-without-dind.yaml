@@ -1,7 +1,6 @@
 apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
+kind: ClusterRole
 metadata:
-  namespace: kube-system
   name: moulick-debug
 rules:
   - apiGroups: [""] # "" indicates the core API group
@@ -11,21 +10,20 @@ rules:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  namespace: kube-system
   name: moulick-debug
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
-kind: RoleBinding
+kind: ClusterRoleBinding
 metadata:
-  namespace: kube-system
   name: moulick-debug
 roleRef:
   apiGroup: rbac.authorization.k8s.io
-  kind: Role
+  kind: ClusterRole
   name: moulick-debug
 subjects:
   - kind: ServiceAccount
     name: moulick-debug
+    namespace: kube-system
 
 ---
 apiVersion: v1
