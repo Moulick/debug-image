@@ -3,7 +3,7 @@ kind: ClusterRole
 metadata:
   name: moulick-debug
 rules:
-  - apiGroups: [""] # "" indicates the core API group
+  - apiGroups: ["*"] # "" indicates the core API group
     resources: ["pods", "deployment"]
     verbs: ["create", "get", "watch", "list"]
 ---
