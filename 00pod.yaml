@@ -7,15 +7,15 @@ metadata:
 spec:
   containers:
     - name: debug
-      image: moulick/debug-image:v2.4
+      image: moulick/debug-image:v2.5
       imagePullPolicy: Always
       resources:
         limits:
-          cpu: 2G
-          memory: 2Gi
+          cpu: 
+          memory: 10Gi
         requests:
           cpu: 100m
-          memory: 100Mi
+          memory: 10Gi
       args:
         - /bin/sh
         - -c

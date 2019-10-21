@@ -1,21 +1,52 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: kube-system
+  name: moulick-debug
+rules:
+  - apiGroups: [""] # "" indicates the core API group
+    resources: ["pods", "deployment"]
+    verbs: ["create", "get", "watch", "list"]
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  namespace: kube-system
+  name: moulick-debug
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: RoleBinding
+metadata:
+  namespace: kube-system
+  name: moulick-debug
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: moulick-debug
+subjects:
+  - kind: ServiceAccount
+    name: moulick-debug
+
+---
 apiVersion: v1
 kind: Pod
 metadata:
   name: moulick-debug
   labels:
     name: moulick-debug
+    namespace: kube-system
 spec:
+  serviceAccountName: moulick-debug
   containers:
     - name: debug
-      image: moulick/debug-image:v2.3
-      imagePullPolicy: Always
+      image: moulick/debug-image:v2.5
       resources:
-        limits:
-          cpu: 2G
-          memory: 2Gi
         requests:
           cpu: 100m
-          memory: 100Mi
+          memory: 100M
+        limits:
+          cpu: 500m
+          memory: 1G
       args:
         - /bin/sh
         - -c
