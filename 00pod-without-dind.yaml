@@ -39,7 +39,7 @@ spec:
   serviceAccountName: moulick-debug
   containers:
     - name: debug
-      image: moulick/debug-image:v2.5
+      image: moulick/debug-image:v2.6
       resources:
         requests:
           cpu: 100m
