@@ -4,7 +4,16 @@ metadata:
   name: moulick-debug
 rules:
   - apiGroups: ["*"] # "" indicates the core API group
-    resources: ["pods", "deployment"]
+    resources:
+      [
+        "pods",
+        "deployments",
+        "nodes",
+        "daemonset",
+        "ingress",
+        "service",
+        "replicaset",
+      ]
     verbs: ["create", "get", "watch", "list"]
 ---
 apiVersion: v1
