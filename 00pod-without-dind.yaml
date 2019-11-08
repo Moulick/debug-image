@@ -69,13 +69,5 @@ spec:
         - /bin/sh
         - -c
         - sleep 100000000
-      volumeMounts:
-        - mountPath: /var/run/docker.sock
-          name: docker-socket-volume
       securityContext:
         privileged: true
-  volumes:
-    - name: docker-socket-volume
-      hostPath:
-        path: /var/run/docker.sock
-        type: File
