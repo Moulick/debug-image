@@ -15,6 +15,7 @@ RUN apt-get update && \
     netcat \
     telnet \
     dnsutils \
+    iputils-ping \
     curl \
     jq \
     nano \
