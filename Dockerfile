@@ -17,8 +17,6 @@ RUN apt-get update && \
     telnet \
     dnsutils \
     iputils-ping \
-    curl \
-    jq \
     nano \
     redis-tools \
     iputils-ping \
@@ -33,7 +31,6 @@ RUN apt-get update && \
     curl \
     gettext \
     openssl \
-    ca-certificates \
     git \
     wget \
     parallel \
@@ -56,8 +53,10 @@ RUN cd /usr/local/bin && \
     tar -xzvf helm-v2.16.7-linux-amd64.tar.gz -C /tmp && \
     rm  helm-v2.16.7-linux-amd64.tar.gz && \
     mv /tmp/linux-amd64/helm . && \
+    curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash && \
     rm -R /tmp/linux-amd64 && \
     chmod +x kubectl && \
-    chmod +x helm
+    chmod +x helm && \
+    chmod +x kustomize
 
 WORKDIR $HOME/somedir
