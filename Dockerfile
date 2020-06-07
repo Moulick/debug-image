@@ -49,9 +49,9 @@ RUN apt-get update && \
 
 RUN cd /usr/local/bin && \
     curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.15.10/2020-02-22/bin/linux/amd64/kubectl && \
-    wget https://get.helm.sh/helm-v2.16.7-linux-amd64.tar.gz && \
-    tar -xzvf helm-v2.16.7-linux-amd64.tar.gz -C /tmp && \
-    rm  helm-v2.16.7-linux-amd64.tar.gz && \
+    curl -o helm.tar.gz https://get.helm.sh/helm-v2.16.7-linux-amd64.tar.gz && \
+    tar -xzvf helm.tar.gz -C /tmp && \
+    rm helm.tar.gz && \
     mv /tmp/linux-amd64/helm . && \
     curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash && \
     rm -R /tmp/linux-amd64 && \

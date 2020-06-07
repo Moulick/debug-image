@@ -1,0 +1,46 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: moulick-debug
+  labels:
+    app.kubernetes.io/component: moulick
+    app.kubernetes.io/instance: moulick
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: moulick
+      app.kubernetes.io/instance: moulick
+  template:
+    metadata:
+      annotations:
+        config.linkerd.io/proxy-cpu-limit: 200m
+        config.linkerd.io/proxy-cpu-request: 100m
+        config.linkerd.io/proxy-memory-limit: 200Mi
+        config.linkerd.io/proxy-memory-request: 100Mi
+        linkerd.io/inject: enabled
+      labels:
+        app.kubernetes.io/component: moulick
+        app.kubernetes.io/instance: moulick
+    spec:
+      # serviceAccountName: org-mgmt
+      containers:
+      - env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: JAEGER_AGENT_HOST
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.hostIP
+        name: moulick-debug
+        image: moulick/debug-image:latest
+        command: [ "/bin/bash", "-c", "--" ]
+        args: [ "while true; do sleep 30; done;" ]
