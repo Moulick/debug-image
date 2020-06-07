@@ -1,6 +1,7 @@
 FROM ubuntu:latest
 ENV docker_url=https://download.docker.com/linux/static/stable/x86_64
 ENV docker_version=19.03.1
+ENV DEBIAN_FRONTEND="noninteractive"
 
 LABEL Maintainer="Moulick Aggarwal" Email="moulickaggarwal@gmail.com"
 
