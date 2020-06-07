@@ -48,7 +48,7 @@ RUN apt-get update && \
     && curl -fsSL $docker_url/docker-$docker_version.tgz | tar zxvf - --strip 1 -C /usr/bin docker/docker
 
 RUN cd /usr/local/bin && \
-    wget https://amazon-eks.s3.us-west-2.amazonaws.com/1.15.10/2020-02-22/bin/darwin/amd64/kubectl && \
+    curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.15.10/2020-02-22/bin/linux/amd64/kubectl && \
     wget https://get.helm.sh/helm-v2.16.7-linux-amd64.tar.gz && \
     tar -xzvf helm-v2.16.7-linux-amd64.tar.gz -C /tmp && \
     rm  helm-v2.16.7-linux-amd64.tar.gz && \
