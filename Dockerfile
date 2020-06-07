@@ -8,7 +8,7 @@ LABEL Maintainer="Moulick Aggarwal" Email="moulickaggarwal@gmail.com"
 # Clean up APT when done.
 RUN apt-get update && \
     apt-get upgrade -y && \
-    apt-get install -y \
+    apt-get install -y --no-install-recommends \
     gnupg2 \
     ca-certificates \
     software-properties-common \
@@ -39,7 +39,7 @@ RUN apt-get update && \
     echo "deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-4.0.list && \
     add-apt-repository -y --no-update ppa:rmescandon/yq && \
     apt-get update -y && \
-    apt-get install -y \
+    apt-get install -y --no-install-recommends \
     mongodb-org-shell \
     mongodb-org-tools \
     yq && \
