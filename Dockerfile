@@ -23,10 +23,10 @@ RUN apt-get update && \
     iputils-ping \
     screen \
     npm \
+    python3 \
+    python3-pip \
     zip \
     jq \
-    python \
-    python-pip \
     groff \
     less \
     curl \
@@ -45,14 +45,14 @@ RUN apt-get update && \
     mongodb-org-shell \
     mongodb-org-tools \
     yq && \
-    pip install --upgrade awscli==1.16.260 s3cmd==2.0.2 python-magic && \
+    pip3 install --upgrade awscli==1.18.74 s3cmd==2.1.0 python-magic && \
     apt-get clean && rm -rf /tmp/* /var/tmp/* /var/lib/apt/lists/* \
     && curl -fsSL $docker_url/docker-$docker_version.tgz | tar zxvf - --strip 1 -C /usr/bin docker/docker
 
 RUN cd /usr/local/bin && \
-    wget https://amazon-eks.s3-us-west-2.amazonaws.com/1.14.6/2019-08-22/bin/linux/amd64/kubectl && \
-    wget https://get.helm.sh/helm-v2.15.0-linux-amd64.tar.gz && \
-    tar -xzvf helm-v2.15.0-linux-amd64.tar.gz -C /tmp && \
+    wget https://amazon-eks.s3.us-west-2.amazonaws.com/1.15.10/2020-02-22/bin/darwin/amd64/kubectl && \
+    wget https://get.helm.sh/helm-v2.16.7-linux-amd64.tar.gz && \
+    tar -xzvf helm-v2.16.7-linux-amd64.tar.gz -C /tmp && \
     mv /tmp/linux-amd64/helm . && \
     rm -R /tmp/linux-amd64 && \
     chmod +x kubectl && \
