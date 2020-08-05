@@ -25,6 +25,7 @@ RUN apt-get update && \
     python3 \
     python3-pip \
     zip \
+    unzip \
     jq \
     groff \
     less \
