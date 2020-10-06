@@ -35,6 +35,7 @@ RUN apt-get update && \
     git \
     wget \
     parallel \
+    default-jre \
     && \
     apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 9DA31620334BD75D9DCB49F368818C72E52529D4 && \
     echo "deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-4.0.list && \
@@ -44,7 +45,6 @@ RUN apt-get update && \
     mongodb-org-shell \
     mongodb-org-tools \
     yq \
-    default-jre \
     && \
     pip3 install --upgrade awscli==1.18.74 s3cmd==2.1.0 python-magic && \
     apt-get clean && rm -rf /tmp/* /var/tmp/* /var/lib/apt/lists/* \
@@ -60,7 +60,7 @@ RUN cd /usr/local/bin && \
     mv /tmp/linux-amd64/helm . && \
     curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash && \
     rm -R /tmp/linux-amd64 && \
-    rm -R amazonmq-cli.zip
+    rm -R amazonmq-cli.zip && \
     chmod +x kubectl && \
     chmod +x helm && \
     chmod +x kustomize
