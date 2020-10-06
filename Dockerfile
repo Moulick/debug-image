@@ -43,7 +43,9 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     mongodb-org-shell \
     mongodb-org-tools \
-    yq && \
+    yq \
+    default-jre \
+    && \
     pip3 install --upgrade awscli==1.18.74 s3cmd==2.1.0 python-magic && \
     apt-get clean && rm -rf /tmp/* /var/tmp/* /var/lib/apt/lists/* \
     && curl -fsSL $docker_url/docker-$docker_version.tgz | tar zxvf - --strip 1 -C /usr/bin docker/docker
@@ -51,11 +53,14 @@ RUN apt-get update && \
 RUN cd /usr/local/bin && \
     curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.15.10/2020-02-22/bin/linux/amd64/kubectl && \
     curl -o helm.tar.gz https://get.helm.sh/helm-v2.16.7-linux-amd64.tar.gz && \
+    curl -o amazonmq-cli.zip https://github.com/antonwierenga/amazonmq-cli/releases/download/v0.2.2/amazonmq-cli-0.2.2.zip && \
+    unzip amazonmq-cli && \
     tar -xzvf helm.tar.gz -C /tmp && \
     rm helm.tar.gz && \
     mv /tmp/linux-amd64/helm . && \
     curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash && \
     rm -R /tmp/linux-amd64 && \
+    rm -R amazonmq-cli.zip
     chmod +x kubectl && \
     chmod +x helm && \
     chmod +x kustomize
