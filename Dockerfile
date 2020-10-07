@@ -52,7 +52,7 @@ RUN apt-get update && \
 
 RUN cd /usr/local/bin && \
     curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.15.10/2020-02-22/bin/linux/amd64/kubectl && \
-    curl -o helm.tar.gz https://get.helm.sh/helm-v2.16.7-linux-amd64.tar.gz && \
+    curl -o helm.tar.gz https://get.helm.sh/helm-v3.3.4-linux-amd64.tar.gz && \
     curl -o amazonmq-cli.zip https://github.com/antonwierenga/amazonmq-cli/releases/download/v0.2.2/amazonmq-cli-0.2.2.zip && \
     unzip amazonmq-cli.zip && \
     tar -xzvf helm.tar.gz -C /tmp && \
