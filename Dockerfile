@@ -67,4 +67,4 @@ RUN cd /usr/local/bin && \
 
 WORKDIR $HOME/somedir
 
-ENTRYPOINT [ "sleep" "infinity" ]
+ENTRYPOINT [ "sleep", "infinity" ]
