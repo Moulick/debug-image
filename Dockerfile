@@ -66,5 +66,3 @@ RUN cd /usr/local/bin && \
     chmod +x kustomize
 
 WORKDIR $HOME/somedir
-
-ENTRYPOINT [ "sleep", "infinity" ]
