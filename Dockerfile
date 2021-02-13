@@ -64,5 +64,3 @@ RUN cd /usr/local/bin && \
     chmod +x kubectl && \
     chmod +x helm && \
     chmod +x kustomize
-
-WORKDIR $HOME
