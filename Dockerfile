@@ -22,6 +22,7 @@ RUN apt-get update && \
     iputils-ping \
     screen \
     npm \
+    rsync \
     python3 \
     python3-pip \
     zip \
