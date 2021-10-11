@@ -1,25 +1,23 @@
-docker-build-master:
-  image: docker:latest
-  stage: build
-  services:
-    - docker:dind
-  before_script:
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
-  script:
-    - docker build --pull -t "$CI_REGISTRY_IMAGE" .
-    - docker push "$CI_REGISTRY_IMAGE"
-  only:
-    - master
 
-docker-build:
-  image: docker:latest
+stages:
+  - build
+
+default:
+  tags:
+    - kubernetes
+
+buildah-build:
   stage: build
-  services:
-    - docker:dind
+  variables:
+    STORAGE_DRIVER: vfs
+  image:
+    name: quay.io/buildah/stable:latest
   before_script:
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - buildah login -u "$CI_REGISTRY_USER" -p "$CI_JOB_TOKEN" "$CI_REGISTRY"
   script:
-    - docker build --pull -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG" .
-    - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
-  except:
-    - master
+    - buildah bud
+      -t "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHA}"
+      -f Dockerfile
+    - buildah tag "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHA}" "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_NAME}"
+    - buildah push "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHA}"
+    - buildah push "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_NAME}"
