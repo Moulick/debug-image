@@ -209,12 +209,12 @@ glowroot() {
 
 start_automation() {
   kubectl scale --replicas=1 deploy -n capabilities ontrack-operator
-  kubectl scale --replicas=1 deploy -n capabilities ontrack-system
+  kubectl scale --replicas=1 deploy -n ontrack-system ontrack-operator
 }
 
 stop_automation() {
   kubectl scale --replicas=0 deploy -n capabilities ontrack-operator
-  kubectl scale --replicas=0 deploy -n capabilities ontrack-system  
+  kubectl scale --replicas=0 deploy -n ontrack-system ontrack-operator
 }
 
 mongo() {
