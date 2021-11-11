@@ -171,6 +171,25 @@ rds-rw() {
   db_shell "$user" "$escaped_password" "$addr" "$port" "$db_name"
 }
 
+rds-rw-v3() {
+  secret=$(kubectl get secret "$1-main-rds-instance" -n "${1}" -o json | jq -er '.data | map_values(@base64d)')
+
+  if [[ -z $secret ]]; then
+    echo "could not connect to $1"
+    return 1
+  fi
+
+  escaped_password=$(urlencode "$(echo "$secret" | jq -er '.MASTER_PASSWORD')")
+  echo "$secret" | jq -r '.ENDPOINT_ADDRESS'
+
+  user=$(echo "$secret" | jq -er '.MASTER_USERNAME')
+  addr=$(echo "$secret" | jq -er '.ENDPOINT_ADDRESS')
+  port=$(echo "$secret" | jq -er '.PORT')
+  db_name=$(echo "$secret" | jq -er '.DB_NAME')
+
+  db_shell "$user" "$escaped_password" "$addr" "$port" "$db_name"
+}
+
 
 argo() {
   local_url="http://localhost:8083"
@@ -208,13 +227,13 @@ glowroot() {
 }
 
 start_automation() {
-  kubectl scale --replicas=1 deploy -n capabilities ontrack-operator
   kubectl scale --replicas=1 deploy -n ontrack-system ontrack-operator
+  kubectl scale --replicas=1 deploy -n capabilities ontrack-operator
 }
 
 stop_automation() {
-  kubectl scale --replicas=0 deploy -n capabilities ontrack-operator
   kubectl scale --replicas=0 deploy -n ontrack-system ontrack-operator
+  kubectl scale --replicas=0 deploy -n capabilities ontrack-operator
 }
 
 mongo() {
