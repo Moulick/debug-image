@@ -113,6 +113,25 @@ in-cluster-post() {
   db_shell "$user" "$escaped_password" "$addr" "$port" "$db_name"
 }
 
+in-cluster-post-create-readonly-user() {
+  secret=$(kubectl get secret "$1-main-postgresql" -n "${1/-(master|develop|v1)/}" -o json | jq -r '.data | map_values(@base64d)')
+  if [[ -z $secret ]]; then
+    echo "could not connect to $1"
+    return 1
+  fi
+
+  escaped_password=$(urlencode "$(echo "$secret" | jq -r '.MAIN_PASSWORD')")
+
+  user=$(echo "$secret" | jq -r '.MAIN_USERNAME')
+  addr="helm-$1-main-postgresql.${1/-(master|develop|v1)/}"
+  port="5432"
+  db_name="main"
+  echo "${addr}"
+
+  create-readonly-user "$user" "$escaped_password" "$addr" "$port" "$db_name"
+}
+
+
 rds-create-readonly-user() {
   secret=$(kubectl get secret "$1-main-postgresql" -n "${1/-(master|develop|v1)/}" -o json | jq -er '.data | map_values(@base64d)')
 
