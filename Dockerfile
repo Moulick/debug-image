@@ -49,7 +49,7 @@ RUN apt-get update && \
     mongodb-org-tools \
     yq \
     && \
-    pip3 install --upgrade awscli==1.20.50 s3cmd==2.2.0 python-magic && \
+    pip3 install --upgrade awscli==1.22.26 s3cmd==2.2.0 python-magic && \
     apt-get clean && rm -rf /tmp/* /var/tmp/* /var/lib/apt/lists/* \
     && curl -fsSL $docker_url/docker-$docker_version.tgz | tar zxvf - --strip 1 -C /usr/bin docker/docker
 
