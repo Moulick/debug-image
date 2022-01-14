@@ -77,7 +77,26 @@ create-readonly-user() {
   db_name=$5
 
   postg="postgresql://$user:$pass@$url:$port/$db_name"
-  SQLCMD=$(cat ~/readonly_user-query.sql)
+
+  SQLCMD='DO
+  $do$
+  BEGIN
+    IF NOT EXISTS (
+        SELECT FROM pg_catalog.pg_roles
+        WHERE  rolname = '\''readonly_user'\'') THEN
+        CREATE ROLE readonly_user LOGIN PASSWORD '\''EfY5czJ&zctM$jcX'\'';
+    END IF;
+    ALTER USER readonly_user PASSWORD '\''EfY5czJ&zctM$jcX'\'';
+  END
+  $do$;
+  REVOKE CREATE ON SCHEMA public FROM public;
+  GRANT SELECT ON ALL TABLES IN SCHEMA public TO readonly_user;
+  ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO readonly_user;
+  GRANT USAGE ON SCHEMA public TO readonly_user;
+  GRANT USAGE ON ALL SEQUENCES IN SCHEMA public TO readonly_user;
+  -- GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public TO readonly_user;
+  ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT USAGE ON SEQUENCES TO readonly_user;'
+  echo $SQLCMD
 
   pod_status=$(kubectl get pods "$pod_name" -n $def_cap -o=jsonpath='{.status.phase}')
 
@@ -96,15 +115,15 @@ alfresco() {
 }
 
 in-cluster-post() {
-  secret=$(kubectl get secret "$1-main-postgresql" -n "${1/-(master|develop|v1)/}" -o json | jq -r '.data | map_values(@base64d)')
+  secret=$(kubectl get secret "$1-main-postgresql" -n "${1}" -o json | jq -r '.data | map_values(@base64d)')
   if [[ -z $secret ]]; then
     echo "could not connect to $1"
     return 1
   fi
 
-  escaped_password=$(urlencode "$(echo "$secret" | jq -r '.MAIN_PASSWORD')")
+  escaped_password=$(urlencode "$(echo -E "$secret" | jq -r '.MAIN_PASSWORD')")
 
-  user=$(echo "$secret" | jq -r '.MAIN_USERNAME')
+  user=$(echo -E "$secret" | jq -r '.MAIN_USERNAME')
   addr="helm-$1-main-postgresql.${1/-(master|develop|v1)/}"
   port="5432"
   db_name="main"
@@ -114,16 +133,16 @@ in-cluster-post() {
 }
 
 in-cluster-post-create-readonly-user() {
-  secret=$(kubectl get secret "$1-main-postgresql" -n "${1/-(master|develop|v1)/}" -o json | jq -r '.data | map_values(@base64d)')
+  secret=$(kubectl get secret "$1-main-postgresql" -n "${1}" -o json | jq -r '.data | map_values(@base64d)')
   if [[ -z $secret ]]; then
     echo "could not connect to $1"
     return 1
   fi
 
-  escaped_password=$(urlencode "$(echo "$secret" | jq -r '.MAIN_PASSWORD')")
+  escaped_password=$(urlencode "$(echo -E "$secret" | jq -r '.MAIN_PASSWORD')")
 
-  user=$(echo "$secret" | jq -r '.MAIN_USERNAME')
-  addr="helm-$1-main-postgresql.${1/-(master|develop|v1)/}"
+  user=$(echo -E "$secret" | jq -r '.MAIN_USERNAME')
+  addr="helm-$1-main-postgresql.${1}"
   port="5432"
   db_name="main"
   echo "${addr}"
@@ -133,27 +152,25 @@ in-cluster-post-create-readonly-user() {
 
 
 rds-create-readonly-user() {
-  secret=$(kubectl get secret "$1-main-postgresql" -n "${1/-(master|develop|v1)/}" -o json | jq -er '.data | map_values(@base64d)')
-
+  secret=$(kubectl get secret "$1-$2-rds-instance" -n "${1}" -o json | jq -er '.data | map_values(@base64d)')
   if [[ -z $secret ]]; then
-    echo "could not connect to $1"
+    echo "could not connect to $1-$2"
     return 1
   fi
+  escaped_password=$(urlencode "$(echo -E "$secret" | jq -er '.MASTER_PASSWORD')")
+  echo -E "$secret" | jq -r '.ENDPOINT_ADDRESS'
 
-  escaped_password=$(urlencode "$(echo "$secret" | jq -er '.MASTER_PASSWORD')")
-  echo "$secret" | jq -r '.DB_INSTANCE_IDENTIFIER'
-
-  user=$(echo "$secret" | jq -er '.MASTER_USERNAME')
-  addr=$(echo "$secret" | jq -er '.ENDPOINT_ADDRESS')
-  port=$(echo "$secret" | jq -er '.PORT')
-  db_name=$(echo "$secret" | jq -er '.DB_NAME')
+  user=$(echo -E "$secret" | jq -er '.MASTER_USERNAME')
+  addr=$(echo -E "$secret" | jq -er '.ENDPOINT_ADDRESS')
+  port=$(echo -E "$secret" | jq -er '.PORT')
+  db_name=$(echo -E "$secret" | jq -er '.DB_NAME')
 
   create-readonly-user "$user" "$escaped_password" "$addr" "$port" "$db_name"
 }
 
 
 rds() {
-  secret=$(kubectl get secret "$1-main-postgresql" -n "${1/-(master|develop|v1)/}" -o json | jq -er '.data | map_values(@base64d)')
+  secret=$(kubectl get secret "$1-main-postgresql" -n "${1}" -o json | jq -er '.data | map_values(@base64d)')
 
   if [[ -z $secret ]]; then
     echo "could not connect to $1"
@@ -161,31 +178,31 @@ rds() {
   fi
 
   escaped_password=$(urlencode "$(security find-generic-password -a moulick.aggarwal -s postgres-readonly -w)")
-  echo "$secret" | jq -r '.DB_INSTANCE_IDENTIFIER'
+  echo -E "$secret" | jq -r '.DB_INSTANCE_IDENTIFIER'
 
   user="readonly_user"
-  addr=$(echo "$secret" | jq -er '.ENDPOINT_ADDRESS')
-  port=$(echo "$secret" | jq -er '.PORT')
-  db_name=$(echo "$secret" | jq -er '.DB_NAME')
+  addr=$(echo -E "$secret" | jq -er '.ENDPOINT_ADDRESS')
+  port=$(echo -E "$secret" | jq -er '.PORT')
+  db_name=$(echo -E "$secret" | jq -er '.DB_NAME')
 
   db_shell "$user" "$escaped_password" "$addr" "$port" "$db_name"
 }
 
 rds-rw() {
-  secret=$(kubectl get secret "$1-main-postgresql" -n "${1/-(master|develop|v1)/}" -o json | jq -er '.data | map_values(@base64d)')
+  secret=$(kubectl get secret "$1-main-postgresql" -n "${1}" -o json | jq -er '.data | map_values(@base64d)')
 
   if [[ -z $secret ]]; then
     echo "could not connect to $1"
     return 1
   fi
 
-  escaped_password=$(urlencode "$(echo "$secret" | jq -er '.MASTER_PASSWORD')")
+  escaped_password=$(urlencode "$(echo -E "$secret" | jq -er '.MASTER_PASSWORD')")
   echo "$secret" | jq -r '.DB_INSTANCE_IDENTIFIER'
 
-  user=$(echo "$secret" | jq -er '.MASTER_USERNAME')
-  addr=$(echo "$secret" | jq -er '.ENDPOINT_ADDRESS')
-  port=$(echo "$secret" | jq -er '.PORT')
-  db_name=$(echo "$secret" | jq -er '.DB_NAME')
+  user=$(echo -E "$secret" | jq -er '.MASTER_USERNAME')
+  addr=$(echo -E "$secret" | jq -er '.ENDPOINT_ADDRESS')
+  port=$(echo -E "$secret" | jq -er '.PORT')
+  db_name=$(echo -E "$secret" | jq -er '.DB_NAME')
 
   db_shell "$user" "$escaped_password" "$addr" "$port" "$db_name"
 }
@@ -198,13 +215,13 @@ rds-rw-v3() {
     return 1
   fi
 
-  escaped_password=$(urlencode "$(echo "$secret" | jq -er '.MASTER_PASSWORD')")
-  echo "$secret" | jq -r '.ENDPOINT_ADDRESS'
+  escaped_password=$(urlencode "$(echo -E "$secret" | jq -er '.MASTER_PASSWORD')")
+  echo -E "$secret" | jq -r '.ENDPOINT_ADDRESS'
 
-  user=$(echo "$secret" | jq -er '.MASTER_USERNAME')
-  addr=$(echo "$secret" | jq -er '.ENDPOINT_ADDRESS')
-  port=$(echo "$secret" | jq -er '.PORT')
-  db_name=$(echo "$secret" | jq -er '.DB_NAME')
+  user=$(echo -E "$secret" | jq -er '.MASTER_USERNAME')
+  addr=$(echo -E "$secret" | jq -er '.ENDPOINT_ADDRESS')
+  port=$(echo -E "$secret" | jq -er '.PORT')
+  db_name=$(echo -E "$secret" | jq -er '.DB_NAME')
 
   db_shell "$user" "$escaped_password" "$addr" "$port" "$db_name"
 }
@@ -265,11 +282,13 @@ mongo() {
   fi
 
   escaped_password=$(urlencode "$(echo "$secret" | jq -er '.MAIN_MONGO_PASSWORD')")
-  user=$(echo "$secret" | jq -er '.MAIN_MONGO_USER')
-  addr=$(echo "$secret" | jq -er '.MAIN_MONGO_HOST')
-  port=$(echo "$secret" | jq -er '.MAIN_MONGO_PORT')
-  db_name=$(echo "$secret" | jq -er '.MAIN_MONGO_DATABASE')
-  replica=$(echo "$secret" | jq -er '.MAIN_MONGO_REPLICA_SET_PARAM')
+  user=$(echo -E "$secret" | jq -er '.MAIN_MONGO_USER')
+  # user="qezzsznytpxyongclq"
+  addr=$(echo -E "$secret" | jq -er '.MAIN_MONGO_HOST')
+  port=$(echo -E "$secret" | jq -er '.MAIN_MONGO_PORT')
+  db_name=$(echo -E "$secret" | jq -er '.MAIN_MONGO_DATABASE')
+  # db_name="main"
+  replica=$(echo -E "$secret" | jq -er '.MAIN_MONGO_REPLICA_SET_PARAM')
   echo "$addr"
 
   mong="mongodb://$user:$escaped_password@$addr:$port/$db_name$replica&authSource=$db_name"
@@ -299,7 +318,7 @@ mq() {
     echo "could get MQ secret"
     return 1
   fi
-  addr=$(echo "$secret" | jq -er '.ATMQ_WEB_CONSOLE')
+  addr=$(echo -E "$secret" | jq -er '.ATMQ_WEB_CONSOLE')
   domain="${addr/(https:\/\/)/}" # removes https:// from url for socat
   domain_standby="${domain/-1.mq/-2.mq}" # url for MQ is running in active/standby mode
 
