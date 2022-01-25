@@ -340,7 +340,7 @@ mongo() {
     echo "Usage: $0 <instance name>" >&2
     return 1
   fi
-
+  # Mongo still needs this version stripping due to needing to get the hostname etc from resourcedata secret
   echo kubectl get secret "$1-resourcedata" -n "${1/-(master|develop|v1)/}" -o json
   secret=$(kubectl get secret "$1-resourcedata" -n "${1/-(master|develop|v1)/}" -o json | jq -er '.data | map_values(@base64d)')
 
