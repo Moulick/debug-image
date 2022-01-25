@@ -64,9 +64,6 @@ RUN curl -o awscliv2.zip "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.z
     curl -o kubectl "https://amazon-eks.s3.us-west-2.amazonaws.com/1.19.6/2021-01-05/bin/linux/amd64/kubectl" && \
     curl -o helm.tar.gz "https://get.helm.sh/helm-$HELM_VERSION-linux-amd64.tar.gz" && \
     curl -L -o amazonmq-cli.zip "https://github.com/antonwierenga/amazonmq-cli/releases/download/v0.2.2/amazonmq-cli-0.2.2.zip" && \
-    curl -o awscliv2.zip "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip"  && \
-    unzip awscliv2.zip & \
-    ./aws/install && \
     unzip amazonmq-cli.zip -d $HOME/amazonmq-cli && \
     tar -xzvf helm.tar.gz -C /tmp && \
     rm helm.tar.gz && \
