@@ -57,6 +57,7 @@ ENV HELM_VERSION=v3.8.0
 
 RUN curl -o awscliv2.zip "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" && \
     unzip awscliv2.zip && \
+    ls -lah && \
     ./aws/install && \
     # rm -R awscliv2.zip ./aws && \
     cd /usr/local/bin && \
