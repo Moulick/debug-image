@@ -342,21 +342,21 @@ mongo() {
   fi
   # Mongo still needs this version stripping due to needing to get the hostname etc from resourcedata secret
   echo kubectl get secret "$1-resourcedata" -n "${1/-(master|develop|v1)/}" -o json
-  secret=$(kubectl get secret "$1-resourcedata" -n "${1/-(master|develop|v1)/}" -o json | jq -er '.data | map_values(@base64d)')
+  mongo_secret=$(kubectl get secret "$1-resourcedata" -n "${1/-(master|develop|v1)/}" -o json | jq -er '.data | map_values(@base64d)')
 
-  if [[ -z $secret ]]; then
+  if [[ -z $mongo_secret ]]; then
     echo "could not connect to $1"
     return 1
   fi
 
-  escaped_password=$(urlencode "$(echo "$secret" | jq -er '.MAIN_MONGO_PASSWORD')")
-  user=$(echo -E "$secret" | jq -er '.MAIN_MONGO_USER')
+  escaped_password=$(urlencode "$(echo "$mongo_secret" | jq -er '.MAIN_MONGO_PASSWORD')")
+  user=$(echo -E "$mongo_secret" | jq -er '.MAIN_MONGO_USER')
   # user="qezzsznytpxyongclq"
-  addr=$(echo -E "$secret" | jq -er '.MAIN_MONGO_HOST')
-  port=$(echo -E "$secret" | jq -er '.MAIN_MONGO_PORT')
-  db_name=$(echo -E "$secret" | jq -er '.MAIN_MONGO_DATABASE')
+  addr=$(echo -E "$mongo_secret" | jq -er '.MAIN_MONGO_HOST')
+  port=$(echo -E "$mongo_secret" | jq -er '.MAIN_MONGO_PORT')
+  db_name=$(echo -E "$mongo_secret" | jq -er '.MAIN_MONGO_DATABASE')
   # db_name="main"
-  replica=$(echo -E "$secret" | jq -er '.MAIN_MONGO_REPLICA_SET_PARAM')
+  replica=$(echo -E "$mongo_secret" | jq -er '.MAIN_MONGO_REPLICA_SET_PARAM')
   echo "$addr"
 
   mong="mongodb://$user:$escaped_password@$addr:$port/$db_name$replica&authSource=$db_name"
@@ -381,24 +381,22 @@ mq() {
   mq_pod="mq-access-$1"
   local_url="https://localhost:8163/admin"
 
-  secret=$(kubectl get secret ontrack3-mq -n ontrack-system -o json | jq -er '.data | map_values(@base64d)')
-  if [[ -z $secret ]]; then
+  mq_secret=$(kubectl get secret ontrack3-mq -n ontrack-system -o json | jq -er '.data | map_values(@base64d)')
+  if [[ -z $mq_secret ]]; then
     echo "could get MQ secret"
     return 1
   fi
-  addr=$(echo -E "$secret" | jq -er '.ATMQ_WEB_CONSOLE')
+  addr=$(echo -E "$mq_secret" | jq -er '.ATMQ_WEB_CONSOLE')
   domain="${addr/(https:\/\/)/}"         # removes https:// from url for socat
   domain_standby="${domain/-1.mq/-2.mq}" # url for MQ is running in active/standby mode
-
+  echo "$mq_secret" | jq -jer '.ACTIVE_MQ_PASSWORD' | pbcopy
   case $1 in
   active)
     web_url=$domain
-    echo "$secret" | jq -er '.ACTIVE_MQ_PASSWORD' | pbcopy
     echo "$web_url"
     ;;
   standby)
     web_url=$domain_standby
-    echo "$secret" | jq -er '.ACTIVE_MQ_PASSWORD' | pbcopy
     echo "$web_url"
     ;;
   *)
