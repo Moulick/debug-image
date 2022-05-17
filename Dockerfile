@@ -6,8 +6,7 @@ ENV DEBIAN_FRONTEND="noninteractive"
 LABEL maintainer="Moulick Aggarwal" email="moulickaggarwal@gmail.com"
 
 # Clean up APT when done.
-RUN set -euo pipefail && \
-    apt-get update && \
+RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
     gnupg2 \
@@ -57,8 +56,7 @@ RUN set -euo pipefail && \
 
 ENV HELM_VERSION=v3.8.0
 
-RUN set -euo pipefail && \
-    curl -o awscliv2.zip "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" && \
+RUN curl -o awscliv2.zip "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" && \
     unzip awscliv2.zip && \
     ls -lah && \
     ./aws/install && \
