@@ -3,10 +3,11 @@ ENV docker_url=https://download.docker.com/linux/static/stable/x86_64
 ENV docker_version=20.10.12
 ENV DEBIAN_FRONTEND="noninteractive"
 
-LABEL Maintainer="Moulick Aggarwal" Email="moulickaggarwal@gmail.com"
+LABEL maintainer="Moulick Aggarwal" email="moulickaggarwal@gmail.com"
 
 # Clean up APT when done.
-RUN apt-get update && \
+RUN set -euo pipefail && \
+    apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
     gnupg2 \
@@ -39,6 +40,7 @@ RUN apt-get update && \
     default-jre \
     ssh \
     iptables \
+    kafkacat \
     && \
     apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 9DA31620334BD75D9DCB49F368818C72E52529D4 && \
     echo "deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-4.0.list && \
@@ -49,13 +51,14 @@ RUN apt-get update && \
     mongodb-org-tools \
     yq \
     && \
-    pip3 install --upgrade s3cmd==2.2.0 python-magic && \
+    pip3 install --no-cache-dir --upgrade s3cmd==2.2.0 python-magic && \
     apt-get clean && rm -rf /tmp/* /var/tmp/* /var/lib/apt/lists/* \
     && curl -fsSL $docker_url/docker-$docker_version.tgz | tar zxvf - --strip 1 -C /usr/bin docker/docker
 
 ENV HELM_VERSION=v3.8.0
 
-RUN curl -o awscliv2.zip "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" && \
+RUN set -euo pipefail && \
+    curl -o awscliv2.zip "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" && \
     unzip awscliv2.zip && \
     ls -lah && \
     ./aws/install && \

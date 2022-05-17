@@ -1,7 +1,7 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: moulick-debug
+  name: moulick-aggarwal-debug
   labels:
     moulick: "true"
 rules:
@@ -21,53 +21,78 @@ rules:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: moulick-debug
-  namespace: kube-system
+  name: moulick-aggarwal-debug
+  namespace: default
   labels:
     moulick: "true"
 
 ---
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: moulick-debug
+  name: moulick-aggarwal-debug
   labels:
     moulick: "true"
 
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: moulick-debug
+  name: moulick-aggarwal-debug
 subjects:
   - kind: ServiceAccount
-    name: moulick-debug
-    namespace: kube-system
+    name: moulick-aggarwal-debug
+    namespace: default
 
 ---
 apiVersion: v1
 kind: Pod
 metadata:
-  name: moulick-debug
-  namespace: kube-system
+  name: moulick-aggarwal-debug
+  namespace: default
   labels:
-    name: moulick-debug
+    name: moulick-aggarwal-debug
     moulick: "true"
-
 spec:
-  serviceAccountName: moulick-debug
+  serviceAccount: moulick-aggarwal-debug
+  volumes:
+    - name: storage
+      persistentVolumeClaim:
+        claimName: moulick-aggarwal-debug
   containers:
     - name: debug
-      image: moulick/debug-image:v2.6
+      image: moulick/debug-image
       resources:
         requests:
-          cpu: 100m
-          memory: 100M
+          cpu: "2"
+          memory: 8G
         limits:
-          cpu: 500m
-          memory: 1G
+          cpu: "2"
+          memory: 8G
+      volumeMounts:
+        - name: storage
+          mountPath: /storage
       args:
-        - /bin/sh
-        - -c
-        - sleep 100000000
+        # - /bin/sh
+        # - -c
+        # - sleep 100000000
+        - /bin/bash 
+        - -c 
+        - "trap : TERM INT; sleep infinity & wait"
       securityContext:
         privileged: true
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: moulick-aggarwal-debug
+  namespace: default
+  labels:
+    name: moulick-aggarwal-debug
+    moulick: "true"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Ti
+  storageClassName: csi-gp2

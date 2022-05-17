@@ -7,7 +7,7 @@ metadata:
 spec:
   containers:
     - name: debug
-      image: moulick/debug-image:v2.5
+      image: moulick/debug-image:latest
       imagePullPolicy: Always
       resources:
         limits:
