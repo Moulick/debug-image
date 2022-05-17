@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM ubuntu:focal
 ENV docker_url=https://download.docker.com/linux/static/stable/x86_64
 ENV docker_version=20.10.12
 ENV DEBIAN_FRONTEND="noninteractive"
@@ -41,8 +41,8 @@ RUN apt-get update && \
     iptables \
     kafkacat \
     && \
-    apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 9DA31620334BD75D9DCB49F368818C72E52529D4 && \
-    echo "deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-4.0.list && \
+    wget -qO - https://www.mongodb.org/static/pgp/server-4.2.asc | apt-key add - && \
+    echo "deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.2 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-4.2.list && \
     add-apt-repository -y --no-update ppa:rmescandon/yq && \
     apt-get update -y && \
     apt-get install -y --no-install-recommends \
