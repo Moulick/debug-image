@@ -1,12 +1,16 @@
-FROM amd64/ubuntu:jammy
+FROM docker.io/amd64/ubuntu:jammy
+
 ENV docker_url=https://download.docker.com/linux/static/stable/x86_64
 ENV docker_version=23.0.3
 ENV HELM_VERSION=v3.11.3
 ENV MONGO_VERSION=4.4
 ENV KUBECTL_VERSION=1.24.11/2023-03-17
+ENV YQ_VERSION=v4.33.3/yq_linux_amd64
 ENV DEBIAN_FRONTEND="noninteractive"
 
-LABEL maintainer="Moulick Aggarwal" email="moulickaggarwal@gmail.com"
+LABEL org.opencontainers.image.authors="moulickaggarwal"
+LABEL org.opencontainers.image.source="https://github.com/Moulick/debug-image"
+LABEL org.opencontainers.image.title="debug-image"
 
 # Clean up APT when done.
 RUN apt-get update && \
@@ -60,22 +64,19 @@ RUN apt-get update && \
 
 RUN pip3 install --no-cache-dir --upgrade s3cmd==2.2.0 python-magic
 
-RUN curl -o awscliv2.zip "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" && \
-    unzip awscliv2.zip && \
-    ls -lah && \
-    ./aws/install && \
-    rm -R awscliv2.zip ./aws && \
+RUN curl -so awscliv2.zip "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" && \
+    unzip -q awscliv2.zip && ./aws/install && rm -R awscliv2.zip ./aws \
+    && \
     cd /usr/local/bin && \
-    curl -o kubectl "https://s3.us-west-2.amazonaws.com/amazon-eks/${KUBECTL_VERSION}/bin/linux/amd64/kubectl" && \
-    curl -o helm.tar.gz "https://get.helm.sh/helm-$HELM_VERSION-linux-amd64.tar.gz" && \
-    curl -L -o amazonmq-cli.zip "https://github.com/antonwierenga/amazonmq-cli/releases/download/v0.2.2/amazonmq-cli-0.2.2.zip" && \
-    unzip amazonmq-cli.zip -d $HOME/amazonmq-cli && \
-    tar -xzvf helm.tar.gz -C /tmp && \
-    rm helm.tar.gz && \
-    mv /tmp/linux-amd64/helm . && \
-    curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash && \
-    rm -R /tmp/linux-amd64 && \
-    rm -R amazonmq-cli.zip && \
+    curl -so yq "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}" && \
+    curl -so kubectl "https://s3.us-west-2.amazonaws.com/amazon-eks/${KUBECTL_VERSION}/bin/linux/amd64/kubectl" && \
+    curl -so helm.tar.gz "https://get.helm.sh/helm-$HELM_VERSION-linux-amd64.tar.gz" && \
+    curl -L -so amazonmq-cli.zip "https://github.com/antonwierenga/amazonmq-cli/releases/download/v0.2.2/amazonmq-cli-0.2.2.zip" && \
+    curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash \
+    && \
+    unzip -q amazonmq-cli.zip -d $HOME/amazonmq-cli && rm -R amazonmq-cli.zip && \
+    tar -xzvf helm.tar.gz -C /tmp && mv /tmp/linux-amd64/helm . && rm helm.tar.gz && rm -R /tmp/linux-amd64 && \
+    chmod +x yq && \
     chmod +x kubectl && \
     chmod +x helm && \
     chmod +x kustomize
