@@ -1,4 +1,4 @@
-FROM ubuntu:focal
+FROM ubuntu:jammy
 ENV docker_url=https://download.docker.com/linux/static/stable/x86_64
 ENV docker_version=20.10.12
 ENV DEBIAN_FRONTEND="noninteractive"
