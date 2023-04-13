@@ -49,7 +49,7 @@ RUN apt-get update && \
     kafkacat \
     && \
     # Need to install libssl1.1 from ubuntu repo as it is not available in focal and needed for mongo shell
-    curl -fsSL http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2.17_amd64.deb -o /tmp/libssl1.1.deb && \
+    curl -fsSLo /tmp/libssl1.1.deb http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2.17_amd64.deb && \
     dpkg -i /tmp/libssl1.1.deb && \
     rm /tmp/libssl1.1.deb && \
     curl -fsSL https://pgp.mongodb.com/server-${MONGO_VERSION}.asc | gpg -o /usr/share/keyrings/mongodb-server-${MONGO_VERSION}.gpg --dearmor && \
@@ -64,19 +64,18 @@ RUN apt-get update && \
 
 RUN pip3 install --no-cache-dir --upgrade s3cmd==2.2.0 python-magic
 
-RUN curl -so awscliv2.zip "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" && \
+RUN curl -fsSlo awscliv2.zip "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" && \
     unzip -q awscliv2.zip && ./aws/install && rm -R awscliv2.zip ./aws \
     && \
     cd /usr/local/bin && \
-    curl -so yq "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}" && \
-    curl -so kubectl "https://s3.us-west-2.amazonaws.com/amazon-eks/${KUBECTL_VERSION}/bin/linux/amd64/kubectl" && \
-    curl -so helm.tar.gz "https://get.helm.sh/helm-$HELM_VERSION-linux-amd64.tar.gz" && \
-    curl -L -so amazonmq-cli.zip "https://github.com/antonwierenga/amazonmq-cli/releases/download/v0.2.2/amazonmq-cli-0.2.2.zip" && \
-    curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash \
+    curl -fsSLo yq "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}" && \
+    curl -fsSLo kubectl "https://s3.us-west-2.amazonaws.com/amazon-eks/${KUBECTL_VERSION}/bin/linux/amd64/kubectl" && \
+    curl -fsSLo helm.tar.gz "https://get.helm.sh/helm-$HELM_VERSION-linux-amd64.tar.gz" && \
+    curl -fsSLo amazonmq-cli.zip "https://github.com/antonwierenga/amazonmq-cli/releases/download/v0.2.2/amazonmq-cli-0.2.2.zip" \
     && \
     unzip -q amazonmq-cli.zip -d $HOME/amazonmq-cli && rm -R amazonmq-cli.zip && \
     tar -xzvf helm.tar.gz -C /tmp && mv /tmp/linux-amd64/helm . && rm helm.tar.gz && rm -R /tmp/linux-amd64 && \
     chmod +x yq && \
     chmod +x kubectl && \
     chmod +x helm && \
-    chmod +x kustomize
+    curl -fsSL "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
