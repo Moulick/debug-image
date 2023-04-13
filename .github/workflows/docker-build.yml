@@ -26,21 +26,21 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Build
+      - name: Build and push
         if: github.ref_name == 'master'
         uses: docker/build-push-action@v4
         with:
           context: .
-          push: false
+          push: true
           tags: moulick/debug-image:latest
           cache-from: type=registry,ref=moulick/debug-image:buildcache
           cache-to: type=registry,ref=moulick/debug-image:buildcache,mode=max
-      - name: Build and push
+      - name: Build only
         if: github.ref_name != 'master'
         uses: docker/build-push-action@v4
         with:
           context: .
-          push: true
+          push: false
           tags: moulick/debug-image:latest
           cache-from: type=registry,ref=moulick/debug-image:buildcache
           cache-to: type=registry,ref=moulick/debug-image:buildcache,mode=max
