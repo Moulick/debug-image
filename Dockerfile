@@ -17,6 +17,7 @@ RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
     gnupg \
+    lsb-release \
     ca-certificates \
     # software-properties-common \
     postgresql-client \
@@ -38,10 +39,10 @@ RUN apt-get update && \
     groff \
     less \
     curl \
+    wget \
     gettext \
     openssl \
     git \
-    wget \
     parallel \
     default-jre \
     ssh \
@@ -54,10 +55,13 @@ RUN apt-get update && \
     rm /tmp/libssl1.1.deb && \
     curl -fsSL https://pgp.mongodb.com/server-${MONGO_VERSION}.asc | gpg -o /usr/share/keyrings/mongodb-server-${MONGO_VERSION}.gpg --dearmor && \
     echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-${MONGO_VERSION}.gpg ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/${MONGO_VERSION} multiverse" | tee /etc/apt/sources.list.d/mongodb-org-${MONGO_VERSION}.list && \
+    wget https://dev.mysql.com/get/mysql-apt-config_0.8.25-1_all.deb && \
+    dpkg -i mysql-apt-config_0.8.25-1_all.deb && \
     apt-get update -y && \
     apt-get install -y --no-install-recommends \
     mongodb-org-shell \
     mongodb-org-tools \
+    mysql-shell \
     && \
     apt-get clean && rm -rf /tmp/* /var/tmp/* /var/lib/apt/lists/* \
     && curl -fsSL $docker_url/docker-$docker_version.tgz | tar zxvf - --strip 1 -C /usr/bin docker/docker
