@@ -6,6 +6,7 @@ ENV HELM_VERSION=v3.11.3
 ENV MONGO_VERSION=4.4
 ENV KUBECTL_VERSION=1.24.11/2023-03-17
 ENV YQ_VERSION=v4.33.3/yq_linux_amd64
+ENV LIBSSL_VERSION=libssl1.1_1.1.1f-1ubuntu2.18_amd64
 ENV DEBIAN_FRONTEND="noninteractive"
 
 LABEL org.opencontainers.image.authors="moulickaggarwal"
@@ -17,8 +18,8 @@ RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
     gnupg \
+    lsb-release \
     ca-certificates \
-    # software-properties-common \
     postgresql-client \
     netcat \
     telnet \
@@ -38,10 +39,10 @@ RUN apt-get update && \
     groff \
     less \
     curl \
+    wget \
     gettext \
     openssl \
     git \
-    wget \
     parallel \
     default-jre \
     ssh \
@@ -49,15 +50,18 @@ RUN apt-get update && \
     kafkacat \
     && \
     # Need to install libssl1.1 from ubuntu repo as it is not available in focal and needed for mongo shell
-    curl -fsSLo /tmp/libssl1.1.deb http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2.17_amd64.deb && \
+    curl -fsSLo /tmp/libssl1.1.deb http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/${LIBSSL_VERSION}.deb && \
     dpkg -i /tmp/libssl1.1.deb && \
     rm /tmp/libssl1.1.deb && \
     curl -fsSL https://pgp.mongodb.com/server-${MONGO_VERSION}.asc | gpg -o /usr/share/keyrings/mongodb-server-${MONGO_VERSION}.gpg --dearmor && \
     echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-${MONGO_VERSION}.gpg ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/${MONGO_VERSION} multiverse" | tee /etc/apt/sources.list.d/mongodb-org-${MONGO_VERSION}.list && \
+    wget https://dev.mysql.com/get/mysql-apt-config_0.8.25-1_all.deb && \
+    dpkg -i mysql-apt-config_0.8.25-1_all.deb && \
     apt-get update -y && \
     apt-get install -y --no-install-recommends \
     mongodb-org-shell \
     mongodb-org-tools \
+    mysql-shell \
     && \
     apt-get clean && rm -rf /tmp/* /var/tmp/* /var/lib/apt/lists/* \
     && curl -fsSL $docker_url/docker-$docker_version.tgz | tar zxvf - --strip 1 -C /usr/bin docker/docker
