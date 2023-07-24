@@ -48,6 +48,8 @@ RUN apt-get update && \
     ssh \
     iptables \
     kafkacat \
+    net-tools\
+    nmap \
     && \
     # Need to install libssl1.1 from ubuntu repo as it is not available in focal and needed for mongo shell
     curl -fsSLo /tmp/libssl1.1.deb http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/${LIBSSL_VERSION}.deb && \
