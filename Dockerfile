@@ -6,7 +6,7 @@ ENV HELM_VERSION=v3.11.3
 ENV MONGO_VERSION=4.4
 ENV KUBECTL_VERSION=1.24.11/2023-03-17
 ENV YQ_VERSION=v4.33.3/yq_linux_amd64
-ENV LIBSSL_VERSION=libssl1.1_1.1.1f-1ubuntu2.18_amd64
+ENV LIBSSL_VERSION=libssl1.1_1.1.1f-1ubuntu2.19_amd64
 ENV DEBIAN_FRONTEND="noninteractive"
 
 LABEL org.opencontainers.image.authors="moulickaggarwal"
