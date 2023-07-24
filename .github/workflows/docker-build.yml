@@ -44,4 +44,4 @@ jobs:
           push: false
           tags: moulick/debug-image:latest
           cache-from: type=registry,ref=moulick/debug-image:buildcache
-          cache-to: type=registry,ref=moulick/debug-image:buildcache,mode=max
+          # cache-to: type=registry,ref=moulick/debug-image:buildcache,mode=max
