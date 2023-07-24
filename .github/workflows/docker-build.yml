@@ -37,11 +37,11 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build ${{ github.ref_name == 'master' && ' and push' || '' }}
+      - name: Build${{ github.ref_name == 'master' && ' and push' || '' }}
         uses: docker/build-push-action@v4
         with:
           context: .
           push: ${{ github.ref_name == 'master'}}
-          tags: moulick/debug-image:${{ github.ref_name == 'master' && 'latest' || github.ref_name }}
+          tags: moulick/debug-image:${{ github.ref_name == 'master' && 'latest' || github.head_ref }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
