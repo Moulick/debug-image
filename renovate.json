@@ -3,6 +3,11 @@
   "extends": [
     "config:base"
   ],
+  "groupName": "all dependencies",
+  "groupSlug": "all",
+  "lockFileMaintenance": {
+    "enabled": false
+  },
   "packageRules": [
     {
       "matchManagers": [
@@ -10,11 +15,17 @@
       ],
       "matchDepTypes": [
         "indirect"
+      ],
+      "groupName": "all dependencies",
+      "groupSlug": "all",
+      "matchPackagePatterns": [
+        "*"
       ]
     }
   ],
   "postUpdateOptions": [
     "gomodTidy",
     "gomodUpdateImportPaths"
-  ]
+  ],
+  "separateMajorMinor": false
 }
