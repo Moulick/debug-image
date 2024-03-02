@@ -55,12 +55,12 @@ jobs:
 
       - name: Build an image from Dockerfile
         run: |
-          docker build -t docker.io/moulick/ingress-whitelister:${{ github.sha }} .
+          docker build -t docker.io/moulick/debug-image:${{ github.sha }} .
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: 'docker.io/moulick/ingress-whitelister:${{ github.sha }}'
+          image-ref: 'docker.io/moulick/debug-image:${{ github.sha }}'
           format: 'sarif'
           output: 'trivy-oci-image.sarif'
           severity: 'CRITICAL,HIGH'
