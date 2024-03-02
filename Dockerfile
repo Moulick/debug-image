@@ -1,11 +1,11 @@
 FROM docker.io/amd64/ubuntu:jammy
 
 ENV docker_url=https://download.docker.com/linux/static/stable/x86_64
-ENV docker_version=23.0.3
-ENV HELM_VERSION=v3.11.3
+ENV docker_version=25.0.3
+ENV HELM_VERSION=v3.14.2
 ENV MONGO_VERSION=4.4
-ENV KUBECTL_VERSION=1.24.11/2023-03-17
-ENV YQ_VERSION=v4.33.3/yq_linux_amd64
+ENV KUBECTL_VERSION=1.29.0/2024-01-04
+ENV YQ_VERSION=v4.42.1/yq_linux_amd64
 ENV LIBSSL_VERSION=1.1_1.1.1f-1ubuntu2.22
 ENV DEBIAN_FRONTEND="noninteractive"
 
@@ -65,7 +65,7 @@ RUN apt-get update && \
     apt-get clean && rm -rf /tmp/* /var/tmp/* /var/lib/apt/lists/* \
     && curl -fsSL $docker_url/docker-$docker_version.tgz | tar zxvf - --strip 1 -C /usr/bin docker/docker
 
-RUN pip3 install --no-cache-dir --upgrade s3cmd==2.2.0 python-magic
+RUN pip3 install --no-cache-dir --upgrade s3cmd==2.4.0 python-magic
 
 RUN curl -fsSlo awscliv2.zip "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" && \
     unzip -q awscliv2.zip && ./aws/install && rm -R awscliv2.zip ./aws \
