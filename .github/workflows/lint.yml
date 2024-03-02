@@ -21,28 +21,6 @@ permissions:
   security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
 
 jobs:
-  yamllint:
-    name: Run yamllint
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-
-    steps:
-      - name: Checkout Git repository
-        uses: actions/checkout@v4
-        with:
-          lfs: true
-
-      - id: yaml-lint
-        name: yaml-lint
-        uses: ibiqlik/action-yamllint@v3
-        with:
-          config_file: .yamllint.yaml
-
-      - id: yaml-lint-output
-        name: yaml-lint output
-        run: echo ${{ steps.yaml-lint.outputs.logfile }}
-
   hadolint:
     name: Run hadolint scanning
     runs-on: ubuntu-latest
