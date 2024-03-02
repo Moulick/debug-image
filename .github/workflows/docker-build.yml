@@ -7,8 +7,8 @@ concurrency:
 on: # yamllint disable-line rule:truthy
   push:
     branches:
-      - "master"
-      - "develop"
+      - master
+      - develop
   pull_request:
     # The branches below must be a subset of the branches above
     branches:
@@ -16,6 +16,8 @@ on: # yamllint disable-line rule:truthy
       - develop
   schedule:
     - cron: "0 9 * * *" # Every day at 9am UTC
+  workflow_dispatch:
+  workflow_call:
 
 jobs:
   docker:
