@@ -11,9 +11,13 @@ updates:
     directory: "/"
     open-pull-requests-limit: 20
     schedule:
-      interval: "weekly"
+      interval: "daily"
     commit-message:
       prefix: ":github:"
+    groups:
+      actions:
+        patterns:
+          - "*"
 
   # Maintain dependencies for Docker
   - package-ecosystem: "docker"
@@ -23,6 +27,10 @@ updates:
       interval: "daily"
     commit-message:
       prefix: ":whale:"
+    groups:
+      actions:
+        patterns:
+          - "*"
 
   # Maintain dependencies for go
   - package-ecosystem: "gomod"
