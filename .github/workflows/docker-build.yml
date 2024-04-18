@@ -14,8 +14,8 @@ on: # yamllint disable-line rule:truthy
     branches:
       - master
       - develop
-  schedule:
-    - cron: "0 9 * * *" # Every day at 9am UTC
+  # schedule:
+  #   - cron: "0 9 * * *" # Every day at 9am UTC
   workflow_dispatch:
   workflow_call:
 
