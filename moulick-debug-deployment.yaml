@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: moulick-debug
+  namespace: moulick-test
   labels:
     app.kubernetes.io/component: moulick
     app.kubernetes.io/instance: moulick
@@ -18,29 +19,29 @@ spec:
         config.linkerd.io/proxy-memory-limit: 200Mi
         config.linkerd.io/proxy-memory-request: 100Mi
         linkerd.io/inject: enabled
+        istio.io/inject: enabled
       labels:
         app.kubernetes.io/component: moulick
         app.kubernetes.io/instance: moulick
     spec:
-      # serviceAccountName: org-mgmt
       containers:
-      - env:
-        - name: POD_NAME
-          valueFrom:
-            fieldRef:
-              apiVersion: v1
-              fieldPath: metadata.name
-        - name: POD_NAMESPACE
-          valueFrom:
-            fieldRef:
-              apiVersion: v1
-              fieldPath: metadata.namespace
-        - name: JAEGER_AGENT_HOST
-          valueFrom:
-            fieldRef:
-              apiVersion: v1
-              fieldPath: status.hostIP
-        name: moulick-debug
-        image: moulick/debug-image:latest
-        command: [ "/bin/bash", "-c", "--" ]
-        args: [ "while true; do sleep 30; done;" ]
+        - env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.namespace
+            - name: JAEGER_AGENT_HOST
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: status.hostIP
+          name: moulick-debug
+          image: moulick/debug-image:latest
+          command: ["/bin/bash", "-c", "--"]
+          args: ["trap : TERM INT; sleep infinity & wait"]
