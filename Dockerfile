@@ -1,4 +1,4 @@
-FROM docker.io/library/ubuntu:noble
+FROM docker.io/amd64/ubuntu:noble
 
 # https://download.docker.com/linux/static/stable/x86_64/
 ENV docker_url=https://download.docker.com/linux/static/stable/x86_64
@@ -20,9 +20,9 @@ LABEL org.opencontainers.image.source="https://github.com/Moulick/debug-image"
 LABEL org.opencontainers.image.title="debug-image"
 
 # Clean up APT when done.
-RUN apt-get update && \
-  apt-get upgrade -y && \
-  apt-get install -y --no-install-recommends \
+RUN apt update && \
+  apt upgrade -y && \
+  apt install -y --no-install-recommends \
   gnupg \
   ca-certificates \
   postgresql-client \
@@ -61,7 +61,7 @@ RUN apt-get update && \
   wget -O /usr/share/keyrings/azlux-archive-keyring.gpg https://azlux.fr/repo.gpg && \
   apt update && \
   apt install oha -y && \
-  apt-get clean && rm -rf /tmp/* /var/tmp/* /var/lib/apt/lists/* && \
+  apt clean && rm -rf /tmp/* /var/tmp/* /var/lib/apt/lists/* && \
   curl -fsSL $docker_url/docker-$docker_version.tgz | tar zxvf - --strip 1 -C /usr/bin docker/docker
 
 RUN pip3 install --break-system-packages --no-cache-dir --upgrade s3cmd==2.4.0 python-magic
