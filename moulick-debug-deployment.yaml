@@ -1,3 +1,56 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: moulick-test
+  labels:
+    istio-injection: enabled
+    moulick: "true"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: moulick-debug
+  labels:
+    moulick: "true"
+rules:
+  - apiGroups: ["*"] # "" indicates the core API group
+    resources:
+      [
+        "pods",
+        "deployments",
+        "nodes",
+        "daemonset",
+        "ingress",
+        "service",
+        "replicaset",
+      ]
+    verbs: ["create", "get", "watch", "list"]
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: moulick-debug
+  namespace: moulick-test
+  labels:
+    moulick: "true"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: moulick-debug
+  labels:
+    moulick: "true"
+
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: moulick-debug
+subjects:
+  - kind: ServiceAccount
+    name: moulick-debug
+    namespace: moulick-test
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -6,11 +59,13 @@ metadata:
   labels:
     app.kubernetes.io/component: moulick
     app.kubernetes.io/instance: moulick
+    moulick: "true"
 spec:
   selector:
     matchLabels:
       app.kubernetes.io/component: moulick
       app.kubernetes.io/instance: moulick
+      moulick: "true"
   template:
     metadata:
       annotations:
@@ -23,9 +78,19 @@ spec:
       labels:
         app.kubernetes.io/component: moulick
         app.kubernetes.io/instance: moulick
+        moulick: "true"
     spec:
+      serviceAccount: moulick-debug
       containers:
-        - env:
+        - name: moulick-debug
+          image: moulick/debug-image:latest
+          imagePullPolicy: Always
+          command: ["/bin/bash", "-c", "--"]
+          args:
+            - /bin/bash
+            - -c
+            - "trap : TERM INT; sleep infinity & wait"
+          env:
             - name: POD_NAME
               valueFrom:
                 fieldRef:
@@ -41,7 +106,3 @@ spec:
                 fieldRef:
                   apiVersion: v1
                   fieldPath: status.hostIP
-          name: moulick-debug
-          image: moulick/debug-image:latest
-          command: ["/bin/bash", "-c", "--"]
-          args: ["trap : TERM INT; sleep infinity & wait"]

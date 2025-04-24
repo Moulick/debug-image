@@ -1,9 +1,20 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: moulick-test
+  labels:
+    istio-injection: enabled
+    moulick: "true"
+---
 apiVersion: v1
 kind: Pod
 metadata:
   name: moulick-debug
+  namespace: moulick-test
   labels:
     name: moulick-debug
+    moulick: "true"
 spec:
   containers:
     - name: debug
@@ -11,15 +22,15 @@ spec:
       imagePullPolicy: Always
       resources:
         limits:
-          cpu: 
-          memory: 10Gi
+          cpu: "1"
+          memory: 2G
         requests:
-          cpu: 100m
-          memory: 10Gi
+          cpu: "1"
+          memory: 2G
       args:
-        - /bin/sh
+        - /bin/bash
         - -c
-        - sleep 100000000
+        - "trap : TERM INT; sleep infinity & wait"
       env:
         - name: POD_IP
           valueFrom:
@@ -49,4 +60,3 @@ spec:
   volumes:
     - name: dind-storage
       emptyDir: {}
-  terminationGracePeriodSeconds: 5
