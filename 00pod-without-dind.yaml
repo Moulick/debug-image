@@ -1,7 +1,16 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: moulick-test
+  labels:
+    istio-injection: enabled
+    moulick: "true"
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: moulick-aggarwal-debug
+  name: moulick-debug
   labels:
     moulick: "true"
 rules:
@@ -21,78 +30,79 @@ rules:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: moulick-aggarwal-debug
-  namespace: default
+  name: moulick-debug
+  namespace: moulick-test
   labels:
     moulick: "true"
-
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: moulick-aggarwal-debug
+  name: moulick-debug
   labels:
     moulick: "true"
 
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: moulick-aggarwal-debug
+  name: moulick-debug
 subjects:
   - kind: ServiceAccount
-    name: moulick-aggarwal-debug
-    namespace: default
-
+    name: moulick-debug
+    namespace: moulick-test
 ---
 apiVersion: v1
 kind: Pod
 metadata:
-  name: moulick-aggarwal-debug
-  namespace: default
+  name: moulick-debug
+  namespace: moulick-test
   labels:
-    name: moulick-aggarwal-debug
+    name: moulick-debug
     moulick: "true"
 spec:
-  serviceAccount: moulick-aggarwal-debug
+  serviceAccount: moulick-debug
   volumes:
     - name: storage
       persistentVolumeClaim:
-        claimName: moulick-aggarwal-debug
+        claimName: moulick-debug
   containers:
     - name: debug
-      image: moulick/debug-image
+      image: moulick/debug-image:latest
+      imagePullPolicy: Always
       resources:
         requests:
-          cpu: "2"
-          memory: 8G
+          cpu: "1"
+          memory: 2G
         limits:
-          cpu: "2"
-          memory: 8G
+          cpu: "1"
+          memory: 2G
       volumeMounts:
         - name: storage
           mountPath: /storage
       args:
-        # - /bin/sh
-        # - -c
-        # - sleep 100000000
-        - /bin/bash 
-        - -c 
+        - /bin/bash
+        - -c
         - "trap : TERM INT; sleep infinity & wait"
+      env:
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
       securityContext:
         privileged: true
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: moulick-aggarwal-debug
-  namespace: default
+  name: moulick-debug
+  namespace: moulick-test
   labels:
-    name: moulick-aggarwal-debug
+    name: moulick-debug
     moulick: "true"
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 1Ti
-  storageClassName: csi-gp2
+      storage: 100Gi
+  storageClassName: gp3
