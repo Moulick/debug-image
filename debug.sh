@@ -51,7 +51,8 @@ kdebug() {
     # tput setaf 1 = red
     echo "$(tput setaf 1)Pod not found or dead 😢 $(tput sgr0)"
     kubectl delete pod "$pod_name" -n $def_cap --grace-period=0 --force --ignore-not-found
-    kubectl run -it --restart=Never "$pod_name" --image=moulick/debug-image:latest -n $def_cap -- bash
+    kubectl run -it --labels="sidecar.istio.io/inject=true" --restart=Never "$pod_name" --image=moulick/debug-image:latest -n $def_cap -- bash
+    # kubectl run -it --restart=Never "$pod_name" --image=moulick/debug-image:latest -n $def_cap -- bash
   fi
 }
 

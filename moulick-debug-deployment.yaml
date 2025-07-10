@@ -16,16 +16,18 @@ metadata:
 rules:
   - apiGroups: ["*"] # "" indicates the core API group
     resources:
-      [
-        "pods",
-        "deployments",
-        "nodes",
-        "daemonset",
-        "ingress",
-        "service",
-        "replicaset",
-      ]
-    verbs: ["create", "get", "watch", "list"]
+      - pods
+      - deployments
+      - nodes
+      - daemonset
+      - ingress
+      - service
+      - replicaset
+    verbs:
+      - create
+      - get
+      - watch
+      - list
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -51,6 +53,19 @@ subjects:
     name: moulick-debug
     namespace: moulick-test
 ---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: moulick-debug
+  namespace: moulick-test
+data:
+  urls.txt: |
+    https://1.1.1.1
+  rest-payload.json: |
+    {
+      "name": "moulick",
+    }
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -61,6 +76,9 @@ metadata:
     app.kubernetes.io/instance: moulick
     moulick: "true"
 spec:
+  replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app.kubernetes.io/component: moulick
@@ -81,15 +99,33 @@ spec:
         moulick: "true"
     spec:
       serviceAccount: moulick-debug
+      volumes:
+        - name: moulick-debug
+          configMap:
+            name: moulick-debug
+        - name: cache-volume
+          emptyDir:
+            sizeLimit: 10Mi
       containers:
         - name: moulick-debug
           image: moulick/debug-image:latest
           imagePullPolicy: Always
-          command: ["/bin/bash", "-c", "--"]
-          args:
-            - /bin/bash
+          volumeMounts:
+            - name: moulick-debug
+              mountPath: /etc/moulick-debug
+            - mountPath: /cache
+              name: cache-volume
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 500m
+              memory: 512Mi
+          command:
+            - /bin/sh
             - -c
-            - "trap : TERM INT; sleep infinity & wait"
+            - "trap : TERM INT; sleep 100000000000000000 & wait"
           env:
             - name: POD_NAME
               valueFrom:
