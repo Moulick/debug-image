@@ -1,6 +1,13 @@
 #!/bin/bash
 
-def_cap="default"
+def_cap() {
+  if [[ "$KUBECONFIG" == "$HOME/.kube/olympus" ]]; then
+    echo "olympus"
+  else
+    echo "moulick-test"
+  fi
+}
+
 pod_name="$(id -un | tr '.' '-')-debug"
 read_only_creds_secret_name=rds-readonly-credentials
 
@@ -44,21 +51,21 @@ urldecode() {
 }
 
 kdebug() {
-  pod_status=$(kubectl get pods "$pod_name" -n $def_cap -o=jsonpath='{.status.phase}')
+  pod_status=$(kubectl get pods "$pod_name" -n "$(def_cap)" -o=jsonpath='{.status.phase}')
   if [[ "$pod_status" == "Running" ]]; then
-    kubectl exec -it "$pod_name" -n $def_cap -- bash
+    kubectl exec -it "$pod_name" -n "$(def_cap)" -- bash
   else
     # tput setaf 1 = red
     echo "$(tput setaf 1)Pod not found or dead 😢 $(tput sgr0)"
-    kubectl delete pod "$pod_name" -n $def_cap --grace-period=0 --force --ignore-not-found
-    kubectl run -it --labels="sidecar.istio.io/inject=true" --restart=Never "$pod_name" --image=moulick/debug-image:latest -n $def_cap -- bash
-    # kubectl run -it --restart=Never "$pod_name" --image=moulick/debug-image:latest -n $def_cap -- bash
+    kubectl delete pod "$pod_name" -n "$(def_cap)" --grace-period=0 --force --ignore-not-found
+    kubectl run -it --labels="sidecar.istio.io/inject=true" --restart=Never "$pod_name" --image=moulick/debug-image:latest -n "$(def_cap)" -- bash
+    # kubectl run -it --restart=Never "$pod_name" --image=moulick/debug-image:latest -n "$(def_cap)" -- bash
   fi
 }
 
 kdebug-kill() {
   echo "\ufb81 Killing pod $pod_name"
-  kubectl delete pod "$pod_name" -n $def_cap --grace-period=0 --force --ignore-not-found
+  kubectl delete pod "$pod_name" -n "$(def_cap)" --grace-period=0 --force --ignore-not-found
 }
 
 db_shell() {
@@ -77,15 +84,15 @@ db_shell() {
 
   postg="postgresql://$user:$pass@$url:$port/$db_name"
 
-  pod_status=$(kubectl get pods "$pod_name" -n $def_cap -o=jsonpath='{.status.phase}')
+  pod_status=$(kubectl get pods "$pod_name" -n "$(def_cap)" -o=jsonpath='{.status.phase}')
 
   if [[ "$pod_status" == "Running" ]]; then
-    kubectl exec -it "$pod_name" -n $def_cap -- psql "$postg"
+    kubectl exec -it "$pod_name" -n "$(def_cap)" -- psql "$postg"
   else
     # tput setaf 1 = red
     echo "$(tput setaf 1)Pod not found or dead 😢, making a new one $(tput sgr0)"
-    kubectl delete pod "$pod_name" -n $def_cap --grace-period=0 --force --ignore-not-found
-    kubectl run -it --restart=Never "$pod_name" --image=moulick/debug-image:latest -n $def_cap -- psql "$postg"
+    kubectl delete pod "$pod_name" -n "$(def_cap)" --grace-period=0 --force --ignore-not-found
+    kubectl run -it --restart=Never "$pod_name" --image=moulick/debug-image:latest -n "$(def_cap)" -- psql "$postg"
   fi
 }
 
@@ -125,15 +132,15 @@ create-readonly-user() {
   ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT USAGE ON SEQUENCES TO readonly_user;'
   echo "$SQLCMD"
 
-  pod_status=$(kubectl get pods "$pod_name" -n $def_cap -o=jsonpath='{.status.phase}')
+  pod_status=$(kubectl get pods "$pod_name" -n "$(def_cap)" -o=jsonpath='{.status.phase}')
 
   if [[ "$pod_status" == "Running" ]]; then
-    kubectl exec -it "$pod_name" -n $def_cap -- psql "$postg" -c "$SQLCMD"
+    kubectl exec -it "$pod_name" -n "$(def_cap)" -- psql "$postg" -c "$SQLCMD"
   else
     # tput setaf 1 = red
     echo "$(tput setaf 1)Pod not found or dead 😢, making a new one $(tput sgr0)"
-    kubectl delete pod "$pod_name" -n $def_cap --grace-period=0 --force --ignore-not-found
-    kubectl run -it --restart=Never "$pod_name" --image=moulick/debug-image:latest -n $def_cap -- psql "$postg" -c "$SQLCMD"
+    kubectl delete pod "$pod_name" -n "$(def_cap)" --grace-period=0 --force --ignore-not-found
+    kubectl run -it --restart=Never "$pod_name" --image=moulick/debug-image:latest -n "$(def_cap)" -- psql "$postg" -c "$SQLCMD"
   fi
 }
 
@@ -362,14 +369,14 @@ mongo() {
 
   mong="mongodb://$user:$escaped_password@$addr:$port/$db_name$replica&authSource=$db_name"
 
-  pod_status=$(kubectl get pods "$pod_name" -n $def_cap -o=jsonpath='{.status.phase}')
+  pod_status=$(kubectl get pods "$pod_name" -n "$(def_cap)" -o=jsonpath='{.status.phase}')
   if [[ "$pod_status" == "Running" ]]; then
-    kubectl exec -it "$pod_name" -n $def_cap -- mongo "$mong"
+    kubectl exec -it "$pod_name" -n "$(def_cap)" -- mongo "$mong"
   else
     # tput setaf 1 = red
     echo "$(tput setaf 1)Pod not found or dead 😢 $(tput sgr0)"
-    kubectl delete pod "$pod_name" -n $def_cap --grace-period=0 --force --ignore-not-found
-    kubectl run -it --restart=Never "$pod_name" --image=moulick/debug-image:latest -n $def_cap -- mongo "$mong"
+    kubectl delete pod "$pod_name" -n "$(def_cap)" --grace-period=0 --force --ignore-not-found
+    kubectl run -it --restart=Never "$pod_name" --image=moulick/debug-image:latest -n "$(def_cap)" -- mongo "$mong"
   fi
 }
 
@@ -406,21 +413,21 @@ mq() {
     ;;
   esac
 
-  pod_status=$(kubectl get pods "$mq_pod" -n $def_cap -o=jsonpath='{.status.phase}')
+  pod_status=$(kubectl get pods "$mq_pod" -n "$(def_cap)" -o=jsonpath='{.status.phase}')
   if [[ "$pod_status" == "Running" ]]; then
     echo "MQ at $local_url"
     open $local_url
-    kubectl port-forward "$mq_pod" -n "$def_cap" 8163:80
+    kubectl port-forward "$mq_pod" -n "$(def_cap)" 8163:80
   else
     # tput setaf 1 = red
     echo "$(tput setaf 1)Pod not found or dead 😢 $(tput sgr0)"
-    kubectl delete pod "$mq_pod" -n $def_cap --grace-period=0 --force --ignore-not-found
+    kubectl delete pod "$mq_pod" -n "$(def_cap)" --grace-period=0 --force --ignore-not-found
     echo "pushing kubectl run to backgroud"
-    kubectl run -i --rm --tty "$mq_pod" -n "$def_cap" --image=alpine/socat --restart=Never tcp-listen:80,fork,reuseaddr tcp-connect:"$web_url" &
+    kubectl run -i --rm --tty "$mq_pod" -n "$(def_cap)" --image=alpine/socat --restart=Never tcp-listen:80,fork,reuseaddr tcp-connect:"$web_url" &
     sleep 5
     echo "MQ at $local_url"
     open $local_url
-    kubectl port-forward "$mq_pod" -n "$def_cap" 8163:80
+    kubectl port-forward "$mq_pod" -n "$(def_cap)" 8163:80
   fi
 }
 
@@ -507,21 +514,21 @@ es() {
   port=$(echo "$secret" | jq -er '.ES_ELASTIC_PORT')
   domain="${addr/(https:\/\/)/}" # removes https:// from url for socat
 
-  pod_status=$(kubectl get pods "$pod" -n $def_cap -o=jsonpath='{.status.phase}')
+  pod_status=$(kubectl get pods "$pod" -n "$(def_cap)" -o=jsonpath='{.status.phase}')
   if [[ "$pod_status" == "Running" ]]; then
     echo "ES at $local_url"
     open "$local_url"
-    kubectl port-forward "$pod" -n "$def_cap" 8085:80
+    kubectl port-forward "$pod" -n "$(def_cap)" 8085:80
   else
     # tput setaf 1 = red
     echo "$(tput setaf 1)Pod not found or dead 😢 $(tput sgr0)"
-    kubectl delete pod "$pod" -n $def_cap --grace-period=0 --force --ignore-not-found
+    kubectl delete pod "$pod" -n "$(def_cap)" --grace-period=0 --force --ignore-not-found
     echo "pushing kubectl run to backgroud"
-    kubectl run -i --rm --tty "$pod" -n "$def_cap" --image=alpine/socat --restart=Never tcp-listen:80,fork,reuseaddr tcp-connect:"$domain:$port" &
+    kubectl run -i --rm --tty "$pod" -n "$(def_cap)" --image=alpine/socat --restart=Never tcp-listen:80,fork,reuseaddr tcp-connect:"$domain:$port" &
     sleep 5
     echo "ES at $local_url"
     open "$local_url"
-    kubectl port-forward "$pod" -n "$def_cap" 8085:80
+    kubectl port-forward "$pod" -n "$(def_cap)" 8085:80
   fi
 }
 
