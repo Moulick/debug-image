@@ -78,6 +78,6 @@ jobs:
 
           ### Pull command:
           \`\`\`bash
-          docker pull $(echo '${{ steps.meta.outputs.tags }}' | head -n1)
+          docker pull --platform linux/amd64 $(echo '${{ steps.meta.outputs.tags }}' | head -n1)
           \`\`\`
           EOF
