@@ -76,9 +76,8 @@ jobs:
           tags: ${{ env.REGISTRIES_JOINED }}
           # labels: ${{ steps.meta.outputs.labels }}
           outputs: type=image,"name=${{ env.REGISTRIES_JOINED }}",push-by-digest=true,name-canonical=true,push=true
-          # push: true
-          # cache-from: type=gha
-          # cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=${{ matrix.slug }},version=2
+          cache-to: type=gha,mode=max,scope=${{ matrix.slug }},version=2
 
       - name: Export digest
         run: |
@@ -140,6 +139,12 @@ jobs:
             org.opencontainers.image.authors=moulickaggarwal
             org.opencontainers.image.vendor=moulick
             org.opencontainers.image.version=${{ github.ref_name }}
+      - name: meta-print
+        run: |
+          echo "tags: ${{ steps.meta.outputs.tags }}"
+          echo "labels: ${{ steps.meta.outputs.labels }}"
+          echo "version: ${{ steps.meta.outputs.version }}"
+          echo "annotations: ${{ steps.meta.outputs.annotations }}"
 
       - name: Create manifest list and push DockerHub
         working-directory: ${{ runner.temp }}/digests
@@ -161,25 +166,26 @@ jobs:
         run: |
           docker buildx imagetools inspect ${{ env.GHCR }}:${{ steps.meta.outputs.version }}
 
-      # - name: Add image URL to summary
-      #   run: |
-      #     cat >> $GITHUB_STEP_SUMMARY <<EOF
-      #     ## 🐳 Docker Image Published
+      - name: Add image URL to summary
+        run: |
+          cat >> $GITHUB_STEP_SUMMARY <<EOF
+          ## 🐳 Docker Image Published
 
-      #     Multi-architecture image built for: **linux/amd64**, **linux/arm64**
+          Multi-architecture image built for: **linux/amd64**, **linux/arm64**
 
-      #     ### Tags:
-      #     \`\`\`
-      #     ${{ steps.meta.outputs.tags }}
-      #     \`\`\`
+          ### Tags:
+          \`\`\`
+          ${{ steps.meta.outputs.tags }}
+          \`\`\`
 
-      #     ### Pull command:
-      #     \`\`\`bash
-      #     docker pull $(echo '${{ steps.meta.outputs.tags }}' | head -n1)
-      #     \`\`\`
+          ### Pull command:
+          \`\`\`bash
+          docker pull $(echo '${{ steps.meta.outputs.tags }}' | head -n1)
+          \`\`\`
 
-      #     ### Run command:
-      #     \`\`\`bash
-      #     docker run --rm -it $(echo '${{ steps.meta.outputs.tags }}' | head -n1)
-      #     \`\`\`
-      #     EOF
+          ### Run command:
+          \`\`\`bash
+          docker run --rm -it $(echo '${{ steps.meta.outputs.tags }}' | head -n1)
+
+          \`\`\`
+          EOF
