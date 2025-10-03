@@ -78,9 +78,9 @@ RUN curl -Lo /usr/local/bin/yq "https://github.com/mikefarah/yq/releases/downloa
   chmod +x /usr/local/bin/yq && \
   yq --version
 
-# https://docs.aws.amazon.com/eks/latest/userguide/install-kubectl.html
-ENV KUBECTL_VERSION=1.34.1/2025-09-19
-RUN curl -Lo /usr/local/bin/kubectl "https://s3.us-west-2.amazonaws.com/amazon-eks/$KUBECTL_VERSION/bin/linux/$TARGETARCH/kubectl" && \
+# https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
+ENV KUBECTL_VERSION=v1.34.1
+RUN curl -Lo /usr/local/bin/kubectl "https://dl.k8s.io/release/$KUBECTL_VERSION/bin/linux/$TARGETARCH/kubectl" && \
   chmod +x /usr/local/bin/kubectl && \
   kubectl version --client=true
 
