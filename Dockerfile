@@ -1,7 +1,8 @@
-FROM docker.io/amd64/ubuntu:noble
+FROM docker.io/ubuntu:noble
 
-# https://download.docker.com/linux/static/stable/x86_64/
-ENV docker_url=https://download.docker.com/linux/static/stable/x86_64
+ARG TARGETARCH
+
+# https://download.docker.com/linux/static/stable/
 ENV docker_version=28.1.1
 
 # https://github.com/helm/helm/releases
@@ -11,7 +12,7 @@ ENV HELM_VERSION=v3.17.3
 ENV KUBECTL_VERSION=1.32.0/2025-01-10
 
 # https://github.com/mikefarah/yq/releases/
-ENV YQ_VERSION=v4.45.1/yq_linux_amd64
+ENV YQ_VERSION=v4.45.1
 
 # https://github.com/fullstorydev/grpcurl/releases
 ENV GRPCURL_VERSION=v1.9.1
@@ -65,7 +66,8 @@ RUN apt update && \
   apt update && \
   apt install oha -y && \
   apt clean && rm -rf /tmp/* /var/tmp/* /var/lib/apt/lists/* && \
-  curl -fsSL $docker_url/docker-$docker_version.tgz | tar zxvf - --strip 1 -C /usr/bin docker/docker
+  DOCKER_ARCH=$([ "$TARGETARCH" = "amd64" ] && echo "x86_64" || echo "aarch64") && \
+  curl -fsSL "https://download.docker.com/linux/static/stable/${DOCKER_ARCH}/docker-${docker_version}.tgz" | tar zxvf - --strip 1 -C /usr/bin docker/docker
 
 RUN pip3 install --break-system-packages --no-cache-dir --upgrade s3cmd==2.4.0 python-magic
 
@@ -73,11 +75,13 @@ RUN curl -fsSlo awscliv2.zip "https://awscli.amazonaws.com/awscli-exe-linux-$(un
   unzip -q awscliv2.zip && ./aws/install && rm -R awscliv2.zip ./aws && aws --version \
   && \
   cd /usr/local/bin && \
-  curl -fsSLo yq "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}" && \
-  curl -fsSLo kubectl "https://s3.us-west-2.amazonaws.com/amazon-eks/${KUBECTL_VERSION}/bin/linux/amd64/kubectl" && \
-  curl -fsSLo helm.tar.gz "https://get.helm.sh/helm-$HELM_VERSION-linux-amd64.tar.gz" && \
-  tar -xzvf helm.tar.gz -C /tmp && mv /tmp/linux-amd64/helm . && rm helm.tar.gz && rm -R /tmp/linux-amd64 && \
-  curl -fsSLo grpcurl.tar.gz "https://github.com/fullstorydev/grpcurl/releases/download/${GRPCURL_VERSION}/grpcurl_${GRPCURL_VERSION#v}_linux_x86_64.tar.gz" && \
+  YQ_ARCH=$([ "$TARGETARCH" = "amd64" ] && echo "yq_linux_amd64" || echo "yq_linux_arm64") && \
+  curl -fsSLo yq "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION%/*}/${YQ_ARCH}" && \
+  curl -fsSLo kubectl "https://s3.us-west-2.amazonaws.com/amazon-eks/${KUBECTL_VERSION}/bin/linux/${TARGETARCH}/kubectl" && \
+  curl -fsSLo helm.tar.gz "https://get.helm.sh/helm-$HELM_VERSION-linux-${TARGETARCH}.tar.gz" && \
+  tar -xzvf helm.tar.gz -C /tmp && mv /tmp/linux-${TARGETARCH}/helm . && rm helm.tar.gz && rm -R /tmp/linux-${TARGETARCH} && \
+  GRPCURL_ARCH=$([ "$TARGETARCH" = "amd64" ] && echo "x86_64" || echo "arm64") && \
+  curl -fsSLo grpcurl.tar.gz "https://github.com/fullstorydev/grpcurl/releases/download/${GRPCURL_VERSION}/grpcurl_${GRPCURL_VERSION#v}_linux_${GRPCURL_ARCH}.tar.gz" && \
   tar -xzvf grpcurl.tar.gz && rm grpcurl.tar.gz && \
   chmod +x yq && yq --version && \
   chmod +x kubectl && kubectl version --client=true && \
