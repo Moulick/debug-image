@@ -15,9 +15,9 @@ RUN echo "TARGETARCH: ${TARGETARCH}" && \
 ENV DEBIAN_FRONTEND="noninteractive"
 
 # Clean up APT when done.
-RUN apt update && \
-  apt upgrade -y && \
-  apt install -y --no-install-recommends \
+RUN apt-get update && \
+  apt-get upgrade -y && \
+  apt-get install -y --no-install-recommends \
   gnupg \
   ca-certificates \
   postgresql-client \
@@ -30,7 +30,6 @@ RUN apt update && \
   redis-tools \
   iputils-ping \
   screen \
-  npm \
   rsync \
   python3 \
   zip \
@@ -50,7 +49,7 @@ RUN apt update && \
   net-tools \
   nmap \
   && \
-  apt clean && rm -rf /tmp/* /var/tmp/* /var/lib/apt/lists/*
+  apt-get clean && rm -rf /tmp/* /var/tmp/* /var/lib/apt/lists/*
 
 COPY --from=ghcr.io/astral-sh/uv:0.8 /uv /uvx /bin/
 RUN uv pip install --system --break-system-packages --no-cache-dir --upgrade s3cmd==2.4.0 python-magic
