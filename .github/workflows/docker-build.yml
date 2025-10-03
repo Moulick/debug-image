@@ -7,12 +7,12 @@ concurrency:
 on: # yamllint disable-line rule:truthy
   push:
     branches:
-      - master
+      - main
       - develop
   pull_request:
     # The branches below must be a subset of the branches above
     branches:
-      - master
+      - main
       - develop
   # schedule:
   #   - cron: "0 9 * * *" # Every day at 9am UTC
