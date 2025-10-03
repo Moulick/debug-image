@@ -48,9 +48,6 @@ jobs:
     runs-on: ${{ matrix.runner }}
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
       - name: Login to DockerHub
         uses: docker/login-action@v3
         with:
@@ -71,7 +68,6 @@ jobs:
         id: build
         uses: docker/build-push-action@v6
         with:
-          context: .
           platforms: ${{ matrix.platform }}
           tags: ${{ env.REGISTRIES_JOINED }}
           # labels: ${{ steps.meta.outputs.labels }}
@@ -183,9 +179,16 @@ jobs:
           docker pull $(echo '${{ steps.meta.outputs.tags }}' | head -n1)
           \`\`\`
 
+          \`\`\`bash
+          docker pull $(echo '${{ steps.meta.outputs.tags }}' | head -n2)
+          \`\`\`
+
           ### Run command:
           \`\`\`bash
           docker run --rm -it $(echo '${{ steps.meta.outputs.tags }}' | head -n1)
+          \`\`\`
 
+          \`\`\`bash
+          docker run --rm -it $(echo '${{ steps.meta.outputs.tags }}' | head -n2)
           \`\`\`
           EOF
