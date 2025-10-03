@@ -13,6 +13,9 @@ ENV KUBECTL_VERSION=1.32.0/2025-01-10
 # https://github.com/mikefarah/yq/releases/
 ENV YQ_VERSION=v4.45.1/yq_linux_amd64
 
+# https://github.com/fullstorydev/grpcurl/releases
+ENV GRPCURL_VERSION=v1.9.1
+
 ENV DEBIAN_FRONTEND="noninteractive"
 
 LABEL org.opencontainers.image.authors="moulickaggarwal"
@@ -74,8 +77,11 @@ RUN curl -fsSlo awscliv2.zip "https://awscli.amazonaws.com/awscli-exe-linux-$(un
   curl -fsSLo kubectl "https://s3.us-west-2.amazonaws.com/amazon-eks/${KUBECTL_VERSION}/bin/linux/amd64/kubectl" && \
   curl -fsSLo helm.tar.gz "https://get.helm.sh/helm-$HELM_VERSION-linux-amd64.tar.gz" && \
   tar -xzvf helm.tar.gz -C /tmp && mv /tmp/linux-amd64/helm . && rm helm.tar.gz && rm -R /tmp/linux-amd64 && \
+  curl -fsSLo grpcurl.tar.gz "https://github.com/fullstorydev/grpcurl/releases/download/${GRPCURL_VERSION}/grpcurl_${GRPCURL_VERSION#v}_linux_x86_64.tar.gz" && \
+  tar -xzvf grpcurl.tar.gz && rm grpcurl.tar.gz && \
   chmod +x yq && yq --version && \
   chmod +x kubectl && kubectl version --client=true && \
   chmod +x helm && helm version && \
+  chmod +x grpcurl && grpcurl --version && \
   curl -fsSL "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash && \
   kustomize version
