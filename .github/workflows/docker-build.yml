@@ -35,7 +35,7 @@ jobs:
       - name: Login to DockerHub
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Login to ghcr.io
         uses: docker/login-action@v3
@@ -68,14 +68,16 @@ jobs:
 
       - name: Add image URL to summary
         run: |
-          echo "## 🐳 Docker Image Published" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Tags:" >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-          echo "${{ steps.meta.outputs.tags }}" >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Pull command:" >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`bash" >> $GITHUB_STEP_SUMMARY
-          echo "docker pull $(echo '${{ steps.meta.outputs.tags }}' | head -n1)" >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          cat >> $GITHUB_STEP_SUMMARY <<EOF
+          ## 🐳 Docker Image Published
+
+          ### Tags:
+          \`\`\`
+          ${{ steps.meta.outputs.tags }}
+          \`\`\`
+
+          ### Pull command:
+          \`\`\`bash
+          docker pull $(echo '${{ steps.meta.outputs.tags }}' | head -n1)
+          \`\`\`
+          EOF
