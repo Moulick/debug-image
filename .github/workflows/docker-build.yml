@@ -128,7 +128,7 @@ jobs:
             type=ref,event=pr,prefix=pr-,suffix=-{{sha}}
             type=raw,value=latest,enable={{is_default_branch}}
             type=ref,event=branch
-          labels:
+          labels: |
             org.opencontainers.image.source=https://github.com/Moulick/debug-image
             org.opencontainers.image.title=debug-image
             org.opencontainers.image.description=A image that contains many tools that are used in daily debugging session, contains a few network tools, some k8s, some db shells, jq and all that jazz
@@ -176,19 +176,19 @@ jobs:
 
           ### Pull command:
           \`\`\`bash
-          docker pull $(echo '${{ steps.meta.outputs.tags }}' | head -n1)
+          docker pull $(echo '${{ steps.meta.outputs.tags }}' | sed -n 1p)
           \`\`\`
 
           \`\`\`bash
-          docker pull $(echo '${{ steps.meta.outputs.tags }}' | head -n2)
+          docker pull $(echo '${{ steps.meta.outputs.tags }}' | sed -n 2p)
           \`\`\`
 
           ### Run command:
           \`\`\`bash
-          docker run --rm -it $(echo '${{ steps.meta.outputs.tags }}' | head -n1)
+          docker run --rm -it $(echo '${{ steps.meta.outputs.tags }}' | sed -n 1p)
           \`\`\`
 
           \`\`\`bash
-          docker run --rm -it $(echo '${{ steps.meta.outputs.tags }}' | head -n2)
+          docker run --rm -it $(echo '${{ steps.meta.outputs.tags }}' | sed -n 2p)
           \`\`\`
           EOF
