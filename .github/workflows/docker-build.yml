@@ -80,4 +80,9 @@ jobs:
           \`\`\`bash
           docker pull --platform linux/amd64 $(echo '${{ steps.meta.outputs.tags }}' | head -n1)
           \`\`\`
+
+          ### Run command:
+          \`\`\`bash
+          docker run --rm -it --platform linux/amd64 $(echo '${{ steps.meta.outputs.tags }}' | head -n1)
+          \`\`\`
           EOF
