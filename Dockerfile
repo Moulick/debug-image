@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM docker.io/library/ubuntu:noble
+FROM docker.io/library/ubuntu:noble
 
 LABEL org.opencontainers.image.authors="moulickaggarwal"
 LABEL org.opencontainers.image.source="https://github.com/Moulick/debug-image"
@@ -93,7 +93,8 @@ RUN curl -L "https://get.helm.sh/helm-$HELM_VERSION-linux-$TARGETARCH.tar.gz" \
 
 # https://github.com/fullstorydev/grpcurl/releases
 ENV GRPCURL_VERSION=v1.9.3
-RUN curl -L "https://github.com/fullstorydev/grpcurl/releases/download/${GRPCURL_VERSION}/grpcurl_${GRPCURL_VERSION#v}_linux_${TARGETARCH}.tar.gz" \
+RUN GRPCURL_ARCH=$([ "${TARGETARCH}" = "amd64" ] && echo "x86_64" || echo "${TARGETARCH}") && \
+  curl -L "https://github.com/fullstorydev/grpcurl/releases/download/${GRPCURL_VERSION}/grpcurl_${GRPCURL_VERSION#v}_linux_${GRPCURL_ARCH}.tar.gz" \
   | tar -zxvf - -C /usr/local/bin grpcurl && \
   chmod +x /usr/local/bin/grpcurl && \
   grpcurl --version
