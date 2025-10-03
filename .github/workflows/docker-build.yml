@@ -45,16 +45,38 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Convert slash in branch name
-        run: |
-          BRANCH_NAME=$(echo ${{ github.head_ref }} | tr / -)
-          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
+      - name: Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            docker.io/moulick/debug-image
+            ghcr.io/moulick/debug-image
+          tags: |
+            type=ref,event=pr,prefix=pr-,suffix=-{{sha}}
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=ref,event=branch
 
-      - name: Build${{ github.ref_name == 'master' && ' and push' || '' }}
+      - name: Build and push
         uses: docker/build-push-action@v6
         with:
           context: .
-          push: ${{ github.ref_name == 'master'}}
-          tags: docker.io/moulick/debug-image:${{ github.ref_name == 'master' && 'latest' || env.BRANCH_NAME }},ghcr.io/moulick/debug-image:${{ github.ref_name == 'master' && 'latest' || env.BRANCH_NAME }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Add image URL to summary
+        run: |
+          echo "## 🐳 Docker Image Published" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Tags:" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "${{ steps.meta.outputs.tags }}" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Pull command:" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`bash" >> $GITHUB_STEP_SUMMARY
+          echo "docker pull $(echo '${{ steps.meta.outputs.tags }}' | head -n1)" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
