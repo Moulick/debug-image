@@ -1,3 +1,4 @@
+---
 name: ci
 
 concurrency:
@@ -19,30 +20,40 @@ on: # yamllint disable-line rule:truthy
   workflow_dispatch:
   workflow_call:
 
+# Precomputed variables
+env:
+  DOCKERHUB: docker.io/moulick/debug-image
+  GHCR: ghcr.io/moulick/debug-image
+  REGISTRIES: |
+    docker.io/moulick/debug-image
+    ghcr.io/moulick/debug-image
+  REGISTRIES_JOINED: docker.io/moulick/debug-image,ghcr.io/moulick/debug-image
+
+# Reference from https://github.com/FoxxMD/multi-scrobbler/blob/f2516206c0eea65ae3ad650dc975c7e9e356cd00/.github/workflows/publishImage.yml
 jobs:
-  docker:
-    runs-on: ubuntu-latest
+  build:
+    permissions:
+      packages: write
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux/amd64
+            runner: ubuntu-24.04
+            slug: linux-amd64
+          - platform: linux/arm64
+            runner: ubuntu-24.04-arm
+            slug: linux-arm64
+    runs-on: ${{ matrix.runner }}
+
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Docker metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: |
-            docker.io/moulick/debug-image
-            ghcr.io/moulick/debug-image
-          tags: |
-            type=ref,event=pr,prefix=pr-,suffix=-{{sha}}
-            type=raw,value=latest,enable={{is_default_branch}}
-            type=ref,event=branch
-
       - name: Login to DockerHub
         uses: docker/login-action@v3
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - name: Login to ghcr.io
         uses: docker/login-action@v3
         with:
@@ -50,22 +61,106 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push by digest
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          platforms: ${{ matrix.platform }}
+          tags: ${{ env.REGISTRIES_JOINED }}
+          # labels: ${{ steps.meta.outputs.labels }}
+          outputs: type=image,"name=${{ env.REGISTRIES_JOINED }}",push-by-digest=true,name-canonical=true,push=true
+          cache-from: type=gha,scope=${{ matrix.slug }},version=2
+          cache-to: type=gha,mode=max,scope=${{ matrix.slug }},version=2
+
+      - name: Export digest
+        run: |
+          mkdir -p ${{ runner.temp }}/digests
+          digest="${{ steps.build.outputs.digest }}"
+          touch "${{ runner.temp }}/digests/${digest#sha256:}"
+
+      - name: Upload digest
+        uses: actions/upload-artifact@v4
+        with:
+          name: digests-${{ matrix.slug }}
+          path: ${{ runner.temp }}/digests/*
+          if-no-files-found: error
+          retention-days: 1
+  merge:
+    runs-on: ubuntu-latest
+    needs:
+      - build
+    permissions:
+      packages: write
+      contents: read
+    steps:
+      - name: Download digests
+        uses: actions/download-artifact@v5
+        with:
+          path: ${{ runner.temp }}/digests
+          pattern: digests-*
+          merge-multiple: true
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Login to ghcr.io
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build and push
-        uses: docker/build-push-action@v6
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
         with:
-          context: .
-          platforms: linux/amd64,linux/arm64
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          images: ${{ env.REGISTRIES }}
+          tags: |
+            type=ref,event=pr,prefix=pr-,suffix=-{{sha}}
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=ref,event=branch
+          labels: |
+            org.opencontainers.image.source=https://github.com/Moulick/debug-image
+            org.opencontainers.image.title=debug-image
+            org.opencontainers.image.description=A image that contains many tools that are used in daily debugging session, contains a few network tools, some k8s, some db shells, jq and all that jazz
+            org.opencontainers.image.authors=moulickaggarwal
+            org.opencontainers.image.vendor=moulick
+            org.opencontainers.image.version=${{ github.ref_name }}
+      - name: meta-print
+        run: |
+          echo "tags: ${{ steps.meta.outputs.tags }}"
+          echo "labels: ${{ steps.meta.outputs.labels }}"
+          echo "version: ${{ steps.meta.outputs.version }}"
+          echo "annotations: ${{ steps.meta.outputs.annotations }}"
+
+      - name: Create manifest list and push DockerHub
+        working-directory: ${{ runner.temp }}/digests
+        run: |
+          docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+             $(printf '${{ env.DOCKERHUB }}@sha256:%s ' *)
+
+      - name: Create manifest list and push GHCR
+        working-directory: ${{ runner.temp }}/digests
+        run: |
+          docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+            $(printf '${{ env.GHCR }}@sha256:%s ' *)
+
+      - name: Inspect image dockerhub
+        run: |
+          docker buildx imagetools inspect ${{ env.DOCKERHUB }}:${{ steps.meta.outputs.version }}
+
+      - name: Inspect image ghcr
+        run: |
+          docker buildx imagetools inspect ${{ env.GHCR }}:${{ steps.meta.outputs.version }}
 
       - name: Add image URL to summary
         run: |
@@ -81,11 +176,19 @@ jobs:
 
           ### Pull command:
           \`\`\`bash
-          docker pull $(echo '${{ steps.meta.outputs.tags }}' | head -n1)
+          docker pull $(echo '${{ steps.meta.outputs.tags }}' | sed -n 1p)
+          \`\`\`
+
+          \`\`\`bash
+          docker pull $(echo '${{ steps.meta.outputs.tags }}' | sed -n 2p)
           \`\`\`
 
           ### Run command:
           \`\`\`bash
-          docker run --rm -it $(echo '${{ steps.meta.outputs.tags }}' | head -n1)
+          docker run --rm -it $(echo '${{ steps.meta.outputs.tags }}' | sed -n 1p)
+          \`\`\`
+
+          \`\`\`bash
+          docker run --rm -it $(echo '${{ steps.meta.outputs.tags }}' | sed -n 2p)
           \`\`\`
           EOF
