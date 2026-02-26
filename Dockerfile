@@ -84,7 +84,7 @@ RUN curl -Lo /usr/local/bin/kubectl "https://dl.k8s.io/release/$KUBECTL_VERSION/
   kubectl version --client=true
 
 # https://github.com/helm/helm/releases
-ENV HELM_VERSION=v3.20.0
+ENV HELM_VERSION=v4.1.1
 RUN curl -L "https://get.helm.sh/helm-$HELM_VERSION-linux-$TARGETARCH.tar.gz" \
   | tar -zxvf - --strip-components=1 -C /usr/local/bin linux-$TARGETARCH/helm && \
   chmod +x /usr/local/bin/helm && \
