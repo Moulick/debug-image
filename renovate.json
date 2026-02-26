@@ -1,0 +1,128 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:base"
+  ],
+  "schedule": [
+    "before 4am"
+  ],
+  "prConcurrentLimit": 20,
+  "packageRules": [
+    {
+      "matchManagers": [
+        "github-actions"
+      ],
+      "groupName": "actions",
+      "commitMessagePrefix": ":github:"
+    },
+    {
+      "matchManagers": [
+        "dockerfile"
+      ],
+      "groupName": "docker",
+      "commitMessagePrefix": ":whale:"
+    },
+    {
+      "matchManagers": [
+        "gomod"
+      ],
+      "groupName": "gomod",
+      "commitMessagePrefix": ":seedling:"
+    },
+    {
+      "matchManagers": [
+        "custom.regex"
+      ],
+      "groupName": "dockerfile-tools",
+      "commitMessagePrefix": ":package:"
+    }
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "fileMatch": [
+        "^Dockerfile$"
+      ],
+      "matchStrings": [
+        "ENV DOCKER_VERSION=(?<currentValue>\\d+\\.\\d+\\.\\d+)"
+      ],
+      "depNameTemplate": "docker/cli",
+      "datasourceTemplate": "github-releases",
+      "extractVersionTemplate": "^v(?<version>\\d+\\.\\d+\\.\\d+)$",
+      "versioningTemplate": "semver"
+    },
+    {
+      "customType": "regex",
+      "fileMatch": [
+        "^Dockerfile$"
+      ],
+      "matchStrings": [
+        "ENV OHA_VERSION=(?<currentValue>v\\d+\\.\\d+\\.\\d+)"
+      ],
+      "depNameTemplate": "hatoo/oha",
+      "datasourceTemplate": "github-releases",
+      "versioningTemplate": "semver"
+    },
+    {
+      "customType": "regex",
+      "fileMatch": [
+        "^Dockerfile$"
+      ],
+      "matchStrings": [
+        "ENV YQ_VERSION=(?<currentValue>v\\d+\\.\\d+\\.\\d+)"
+      ],
+      "depNameTemplate": "mikefarah/yq",
+      "datasourceTemplate": "github-releases",
+      "versioningTemplate": "semver"
+    },
+    {
+      "customType": "regex",
+      "fileMatch": [
+        "^Dockerfile$"
+      ],
+      "matchStrings": [
+        "ENV KUBECTL_VERSION=(?<currentValue>v\\d+\\.\\d+\\.\\d+)"
+      ],
+      "depNameTemplate": "kubernetes/kubernetes",
+      "datasourceTemplate": "github-releases",
+      "versioningTemplate": "semver"
+    },
+    {
+      "customType": "regex",
+      "fileMatch": [
+        "^Dockerfile$"
+      ],
+      "matchStrings": [
+        "ENV HELM_VERSION=(?<currentValue>v\\d+\\.\\d+\\.\\d+)"
+      ],
+      "depNameTemplate": "helm/helm",
+      "datasourceTemplate": "github-releases",
+      "versioningTemplate": "semver"
+    },
+    {
+      "customType": "regex",
+      "fileMatch": [
+        "^Dockerfile$"
+      ],
+      "matchStrings": [
+        "ENV GRPCURL_VERSION=(?<currentValue>v\\d+\\.\\d+\\.\\d+)"
+      ],
+      "depNameTemplate": "fullstorydev/grpcurl",
+      "datasourceTemplate": "github-releases",
+      "versioningTemplate": "semver"
+    },
+    {
+      "customType": "regex",
+      "fileMatch": [
+        "^Dockerfile$"
+      ],
+      "matchStrings": [
+        "ENV KUSTOMIZE_VERSION=(?<currentValue>v\\d+\\.\\d+\\.\\d+)"
+      ],
+      "depNameTemplate": "kubernetes-sigs/kustomize",
+      "datasourceTemplate": "github-releases",
+      "extractVersionTemplate": "^(?:kustomize/)?(?<version>v\\d+\\.\\d+\\.\\d+)$",
+      "versioningTemplate": "semver"
+    }
+  ]
+}
