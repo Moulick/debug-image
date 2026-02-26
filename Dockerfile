@@ -51,7 +51,7 @@ RUN apt-get update && \
   && \
   apt-get clean && rm -rf /tmp/* /var/tmp/* /var/lib/apt/lists/*
 
-COPY --from=ghcr.io/astral-sh/uv:0.8 /uv /uvx /bin/
+COPY --from=ghcr.io/astral-sh/uv:0.10 /uv /uvx /bin/
 RUN uv pip install --system --break-system-packages --no-cache-dir --upgrade s3cmd==2.4.0 python-magic
 
 # https://download.docker.com/linux/static/stable/
