@@ -66,25 +66,25 @@ RUN curl -lo awscliv2.zip "https://awscli.amazonaws.com/awscli-exe-linux-$(uname
   aws --version
 
 # https://github.com/hatoo/oha/releases
-ENV OHA_VERSION=v1.10.0
+ENV OHA_VERSION=v1.13.0
 RUN curl -Lo /usr/local/bin/oha "https://github.com/hatoo/oha/releases/download/${OHA_VERSION}/oha-linux-${TARGETARCH}" && \
   chmod +x /usr/local/bin/oha && \
   oha --version
 
 # https://github.com/mikefarah/yq/releases/
-ENV YQ_VERSION=v4.47.2
+ENV YQ_VERSION=v4.52.4
 RUN curl -Lo /usr/local/bin/yq "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_$TARGETARCH" && \
   chmod +x /usr/local/bin/yq && \
   yq --version
 
 # https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
-ENV KUBECTL_VERSION=v1.34.1
+ENV KUBECTL_VERSION=v1.35.1
 RUN curl -Lo /usr/local/bin/kubectl "https://dl.k8s.io/release/$KUBECTL_VERSION/bin/linux/$TARGETARCH/kubectl" && \
   chmod +x /usr/local/bin/kubectl && \
   kubectl version --client=true
 
 # https://github.com/helm/helm/releases
-ENV HELM_VERSION=v3.19.0
+ENV HELM_VERSION=v3.20.0
 RUN curl -L "https://get.helm.sh/helm-$HELM_VERSION-linux-$TARGETARCH.tar.gz" \
   | tar -zxvf - --strip-components=1 -C /usr/local/bin linux-$TARGETARCH/helm && \
   chmod +x /usr/local/bin/helm && \
@@ -99,7 +99,7 @@ RUN GRPCURL_ARCH=$([ "${TARGETARCH}" = "amd64" ] && echo "x86_64" || echo "${TAR
   grpcurl --version
 
 # https://github.com/kubernetes-sigs/kustomize/releases
-ENV KUSTOMIZE_VERSION=v5.7.1
+ENV KUSTOMIZE_VERSION=v5.8.1
 RUN curl -L "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/${KUSTOMIZE_VERSION}/kustomize_${KUSTOMIZE_VERSION}_linux_${TARGETARCH}.tar.gz" \
   | tar -zxvf - -C /usr/local/bin kustomize && \
   chmod +x /usr/local/bin/kustomize && \
