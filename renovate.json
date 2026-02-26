@@ -1,7 +1,7 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:base"
+    "config:recommended"
   ],
   "schedule": [
     "before 4am"
@@ -40,8 +40,8 @@
   "customManagers": [
     {
       "customType": "regex",
-      "fileMatch": [
-        "^Dockerfile$"
+      "managerFilePatterns": [
+        "/^Dockerfile$/"
       ],
       "matchStrings": [
         "ENV DOCKER_VERSION=(?<currentValue>\\d+\\.\\d+\\.\\d+)"
@@ -53,8 +53,8 @@
     },
     {
       "customType": "regex",
-      "fileMatch": [
-        "^Dockerfile$"
+      "managerFilePatterns": [
+        "/^Dockerfile$/"
       ],
       "matchStrings": [
         "ENV OHA_VERSION=(?<currentValue>v\\d+\\.\\d+\\.\\d+)"
@@ -65,8 +65,8 @@
     },
     {
       "customType": "regex",
-      "fileMatch": [
-        "^Dockerfile$"
+      "managerFilePatterns": [
+        "/^Dockerfile$/"
       ],
       "matchStrings": [
         "ENV YQ_VERSION=(?<currentValue>v\\d+\\.\\d+\\.\\d+)"
@@ -77,8 +77,8 @@
     },
     {
       "customType": "regex",
-      "fileMatch": [
-        "^Dockerfile$"
+      "managerFilePatterns": [
+        "/^Dockerfile$/"
       ],
       "matchStrings": [
         "ENV KUBECTL_VERSION=(?<currentValue>v\\d+\\.\\d+\\.\\d+)"
@@ -89,8 +89,8 @@
     },
     {
       "customType": "regex",
-      "fileMatch": [
-        "^Dockerfile$"
+      "managerFilePatterns": [
+        "/^Dockerfile$/"
       ],
       "matchStrings": [
         "ENV HELM_VERSION=(?<currentValue>v\\d+\\.\\d+\\.\\d+)"
@@ -101,8 +101,8 @@
     },
     {
       "customType": "regex",
-      "fileMatch": [
-        "^Dockerfile$"
+      "managerFilePatterns": [
+        "/^Dockerfile$/"
       ],
       "matchStrings": [
         "ENV GRPCURL_VERSION=(?<currentValue>v\\d+\\.\\d+\\.\\d+)"
@@ -113,8 +113,8 @@
     },
     {
       "customType": "regex",
-      "fileMatch": [
-        "^Dockerfile$"
+      "managerFilePatterns": [
+        "/^Dockerfile$/"
       ],
       "matchStrings": [
         "ENV KUSTOMIZE_VERSION=(?<currentValue>v\\d+\\.\\d+\\.\\d+)"
