@@ -8,9 +8,5 @@
     ":assignAndReview(Moulick)",
     ":automergeDisabled",
     ":automergeLinters"
-  ],
-  "schedule": [
-    "before 4am"
-  ],
-  "prConcurrentLimit": 20
+  ]
 }
