@@ -75,7 +75,7 @@ RUN curl -Lo /usr/local/bin/oha "https://github.com/hatoo/oha/releases/download/
 
 # https://github.com/mikefarah/yq/releases/
 # renovate: datasource=github-releases depName=yq packageName=mikefarah/yq
-ENV YQ_VERSION=v4.52.2
+ENV YQ_VERSION=v4.52.4
 RUN curl -Lo /usr/local/bin/yq "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_$TARGETARCH" && \
   chmod +x /usr/local/bin/yq && \
   yq --version
