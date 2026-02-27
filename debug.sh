@@ -51,21 +51,35 @@ urldecode() {
 }
 
 kdebug() {
-  pod_status=$(kubectl get pods "$pod_name" -n "$(def_cap)" -o=jsonpath='{.status.phase}')
+  local ns="${1:-$(def_cap)}"
+  local istio="${2:-true}"
+
+  pod_status=$(kubectl get pods "$pod_name" -n "$ns" -o=jsonpath='{.status.phase}')
   if [[ "$pod_status" == "Running" ]]; then
-    kubectl exec -it "$pod_name" -n "$(def_cap)" -- bash
+    kubectl exec -it "$pod_name" -n "$ns" -- bash
   else
     # tput setaf 1 = red
     echo "$(tput setaf 1)Pod not found or dead 😢 $(tput sgr0)"
-    kubectl delete pod "$pod_name" -n "$(def_cap)" --grace-period=0 --force --ignore-not-found
-    kubectl run -it --labels="sidecar.istio.io/inject=true" --restart=Never "$pod_name" --image=moulick/debug-image:latest -n "$(def_cap)" -- bash
-    # kubectl run -it --restart=Never "$pod_name" --image=moulick/debug-image:latest -n "$(def_cap)" -- bash
+    kubectl delete pod "$pod_name" -n "$ns" --grace-period=0 --force --ignore-not-found
+    kubectl run "$pod_name" -it \
+      --labels="sidecar.istio.io/inject=$istio" \
+      --overrides='[{"op":"replace", "path":"/spec/containers/0/resources/requests", "value":{"cpu": "300m", "memory": "512Mi"}}]' \
+      --override-type=json \
+      --restart=Never \
+      --image=moulick/debug-image:latest \
+      --namespace "$ns" \
+      -- bash
   fi
 }
 
 kdebug-kill() {
-  echo "\ufb81 Killing pod $pod_name"
-  kubectl delete pod "$pod_name" -n "$(def_cap)" --grace-period=0 --force --ignore-not-found
+  echo "\ufb81 Finding all debug pods across the cluster"
+  kubectl get pods --all-namespaces --no-headers -o custom-columns='NS:.metadata.namespace,NAME:.metadata.name' | \
+    grep "$pod_name" | \
+    while read -r ns pod; do
+      echo "Deleting pod $pod in namespace $ns"
+      kubectl delete pod "$pod" -n "$ns" --grace-period=0 --force --ignore-not-found
+    done
 }
 
 db_shell() {
