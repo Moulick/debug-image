@@ -97,7 +97,7 @@ RUN curl -L "https://get.helm.sh/helm-$HELM_VERSION-linux-$TARGETARCH.tar.gz" \
 
 # https://github.com/fullstorydev/grpcurl/releases
 # renovate: datasource=github-releases depName=grpcurl packageName=fullstorydev/grpcurl
-ENV GRPCURL_VERSION=v1.9.2
+ENV GRPCURL_VERSION=v1.9.3
 RUN GRPCURL_ARCH=$([ "${TARGETARCH}" = "amd64" ] && echo "x86_64" || echo "${TARGETARCH}") && \
   curl -L "https://github.com/fullstorydev/grpcurl/releases/download/${GRPCURL_VERSION}/grpcurl_${GRPCURL_VERSION#v}_linux_${GRPCURL_ARCH}.tar.gz" \
   | tar -zxvf - -C /usr/local/bin grpcurl && \
