@@ -5,6 +5,7 @@
     "abandonments:recommended",
     "customManagers:dockerfileVersions",
     "customManagers:githubActionsVersions",
+    "group:allNonMajor",
     ":assignAndReview(Moulick)",
     ":automergeDisabled",
     ":automergeLinters"
