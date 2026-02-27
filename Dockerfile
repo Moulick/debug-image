@@ -60,7 +60,10 @@ ENV DOCKER_VERSION=29.2.1
 RUN curl -L "https://download.docker.com/linux/static/stable/$(uname -m)/docker-${DOCKER_VERSION}.tgz" \
   | tar -zxvf - --strip 1 -C /usr/bin docker/docker
 
-RUN curl -lo awscliv2.zip "https://awscli.amazonaws.com/awscli-exe-linux-$(uname -m).zip" && \
+# https://github.com/aws/aws-cli/tags
+# renovate: datasource=github-tags depName=aws-cli packageName=aws/aws-cli
+ENV AWS_CLI_VERSION=2.33.30
+RUN curl -lo awscliv2.zip "https://awscli.amazonaws.com/awscli-exe-linux-$(uname -m)-${AWS_CLI_VERSION}.zip" && \
   unzip -q awscliv2.zip && \
   ./aws/install && \
   rm -R awscliv2.zip ./aws && \

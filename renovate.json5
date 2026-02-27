@@ -1,0 +1,13 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    "abandonments:recommended",
+    "customManagers:dockerfileVersions", // # renovate: datasource=(?<datasource>[a-zA-Z0-9-._]+?) depName=(?<depName>[^\s]+?)(?: (lookupName|packageName)=(?<packageName>[^\s]+?))?(?: versioning=(?<versioning>[^\s]+?))?(?: extractVersion=(?<extractVersion>[^\s]+?))?(?: registryUrl=(?<registryUrl>[^\s]+?))?\s(?:ENV|ARG)\s+[A-Za-z0-9_]+?_VERSION[ =][\"']?(?<currentValue>.+?)[\"']?\s
+    "customManagers:githubActionsVersions",
+    "group:allNonMajor",
+    ":assignAndReview(Moulick)",
+    ":automergeDisabled",
+    ":automergeLinters"
+  ]
+}
