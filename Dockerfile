@@ -56,7 +56,7 @@ RUN uv pip install --system --break-system-packages --no-cache-dir --upgrade s3c
 
 # https://download.docker.com/linux/static/stable/
 # renovate: datasource=docker depName=docker packageName=docker versioning=docker
-ENV DOCKER_VERSION=28.5.2
+ENV DOCKER_VERSION=29.2.1
 RUN curl -L "https://download.docker.com/linux/static/stable/$(uname -m)/docker-${DOCKER_VERSION}.tgz" \
   | tar -zxvf - --strip 1 -C /usr/bin docker/docker
 
