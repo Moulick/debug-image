@@ -55,6 +55,7 @@ COPY --from=ghcr.io/astral-sh/uv:0.10 /uv /uvx /bin/
 RUN uv pip install --system --break-system-packages --no-cache-dir --upgrade s3cmd==2.4.0 python-magic
 
 # https://download.docker.com/linux/static/stable/
+# renovate: datasource=docker packageName=docker versioning=docker
 ENV DOCKER_VERSION=28.5.0
 RUN curl -L "https://download.docker.com/linux/static/stable/$(uname -m)/docker-${DOCKER_VERSION}.tgz" \
   | tar -zxvf - --strip 1 -C /usr/bin docker/docker
