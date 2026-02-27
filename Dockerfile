@@ -78,7 +78,7 @@ RUN curl -Lo /usr/local/bin/yq "https://github.com/mikefarah/yq/releases/downloa
   yq --version
 
 # https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
-ENV KUBECTL_VERSION=v1.35.1
+ENV KUBECTL_VERSION=v1.35.2
 RUN curl -Lo /usr/local/bin/kubectl "https://dl.k8s.io/release/$KUBECTL_VERSION/bin/linux/$TARGETARCH/kubectl" && \
   chmod +x /usr/local/bin/kubectl && \
   kubectl version --client=true
