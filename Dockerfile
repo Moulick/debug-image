@@ -62,7 +62,7 @@ RUN curl -L "https://download.docker.com/linux/static/stable/$(uname -m)/docker-
 
 # https://github.com/aws/aws-cli/tags
 # renovate: datasource=github-tags depName=aws-cli packageName=aws/aws-cli
-ENV AWS_CLI_VERSION=2.33.30
+ENV AWS_CLI_VERSION=2.33.31
 RUN curl -lo awscliv2.zip "https://awscli.amazonaws.com/awscli-exe-linux-$(uname -m)-${AWS_CLI_VERSION}.zip" && \
   unzip -q awscliv2.zip && \
   ./aws/install && \
