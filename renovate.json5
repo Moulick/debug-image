@@ -9,5 +9,15 @@
     ":assignAndReview(Moulick)",
     ":automergeDisabled",
     ":automergeLinters"
+  ],
+  "packageRules": [
+    {
+      "matchPackageNames": [
+        "aws/*{/,}**"
+      ],
+      "schedule": [
+        "* * 1,10,20,30 * *"
+      ]
+    }
   ]
 }
