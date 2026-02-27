@@ -55,7 +55,7 @@ COPY --from=ghcr.io/astral-sh/uv:0.10 /uv /uvx /bin/
 RUN uv pip install --system --break-system-packages --no-cache-dir --upgrade s3cmd==2.4.0 python-magic
 
 # https://download.docker.com/linux/static/stable/
-# renovate: datasource=docker packageName=docker versioning=docker
+# renovate: datasource=docker depName=docker packageName=docker versioning=docker
 ENV DOCKER_VERSION=28.5.0
 RUN curl -L "https://download.docker.com/linux/static/stable/$(uname -m)/docker-${DOCKER_VERSION}.tgz" \
   | tar -zxvf - --strip 1 -C /usr/bin docker/docker
@@ -67,24 +67,28 @@ RUN curl -lo awscliv2.zip "https://awscli.amazonaws.com/awscli-exe-linux-$(uname
   aws --version
 
 # https://github.com/hatoo/oha/releases
+# renovate: datasource=github-releases depName=oha packageName=hatoo/oha versioning=semver-coerced
 ENV OHA_VERSION=v1.13.0
 RUN curl -Lo /usr/local/bin/oha "https://github.com/hatoo/oha/releases/download/${OHA_VERSION}/oha-linux-${TARGETARCH}" && \
   chmod +x /usr/local/bin/oha && \
   oha --version
 
 # https://github.com/mikefarah/yq/releases/
-ENV YQ_VERSION=v4.52.4
+# renovate: datasource=github-releases depName=yq packageName=mikefarah/yq
+ENV YQ_VERSION=v4.52.2
 RUN curl -Lo /usr/local/bin/yq "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_$TARGETARCH" && \
   chmod +x /usr/local/bin/yq && \
   yq --version
 
 # https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
-ENV KUBECTL_VERSION=v1.35.1
+# renovate: datasource=github-releases depName=kubectl packageName=kubernetes/kubernetes
+ENV KUBECTL_VERSION=v1.34.0
 RUN curl -Lo /usr/local/bin/kubectl "https://dl.k8s.io/release/$KUBECTL_VERSION/bin/linux/$TARGETARCH/kubectl" && \
   chmod +x /usr/local/bin/kubectl && \
   kubectl version --client=true
 
 # https://github.com/helm/helm/releases
+# renovate: datasource=github-releases depName=helm packageName=helm/helm
 ENV HELM_VERSION=v4.1.1
 RUN curl -L "https://get.helm.sh/helm-$HELM_VERSION-linux-$TARGETARCH.tar.gz" \
   | tar -zxvf - --strip-components=1 -C /usr/local/bin linux-$TARGETARCH/helm && \
@@ -92,7 +96,8 @@ RUN curl -L "https://get.helm.sh/helm-$HELM_VERSION-linux-$TARGETARCH.tar.gz" \
   helm version
 
 # https://github.com/fullstorydev/grpcurl/releases
-ENV GRPCURL_VERSION=v1.9.3
+# renovate: datasource=github-releases depName=grpcurl packageName=fullstorydev/grpcurl
+ENV GRPCURL_VERSION=v1.9.2
 RUN GRPCURL_ARCH=$([ "${TARGETARCH}" = "amd64" ] && echo "x86_64" || echo "${TARGETARCH}") && \
   curl -L "https://github.com/fullstorydev/grpcurl/releases/download/${GRPCURL_VERSION}/grpcurl_${GRPCURL_VERSION#v}_linux_${GRPCURL_ARCH}.tar.gz" \
   | tar -zxvf - -C /usr/local/bin grpcurl && \
@@ -100,6 +105,7 @@ RUN GRPCURL_ARCH=$([ "${TARGETARCH}" = "amd64" ] && echo "x86_64" || echo "${TAR
   grpcurl --version
 
 # https://github.com/kubernetes-sigs/kustomize/releases
+# renovate: datasource=github-releases depName=kustomize packageName=kubernetes-sigs/kustomize
 ENV KUSTOMIZE_VERSION=v5.8.1
 RUN curl -L "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/${KUSTOMIZE_VERSION}/kustomize_${KUSTOMIZE_VERSION}_linux_${TARGETARCH}.tar.gz" \
   | tar -zxvf - -C /usr/local/bin kustomize && \
