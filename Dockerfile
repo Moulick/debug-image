@@ -56,7 +56,7 @@ RUN uv pip install --system --break-system-packages --no-cache-dir --upgrade s3c
 
 # https://download.docker.com/linux/static/stable/
 # renovate: datasource=docker depName=docker packageName=docker versioning=docker
-ENV DOCKER_VERSION=28.5.0
+ENV DOCKER_VERSION=28.5.2
 RUN curl -L "https://download.docker.com/linux/static/stable/$(uname -m)/docker-${DOCKER_VERSION}.tgz" \
   | tar -zxvf - --strip 1 -C /usr/bin docker/docker
 
@@ -75,14 +75,14 @@ RUN curl -Lo /usr/local/bin/oha "https://github.com/hatoo/oha/releases/download/
 
 # https://github.com/mikefarah/yq/releases/
 # renovate: datasource=github-releases depName=yq packageName=mikefarah/yq
-ENV YQ_VERSION=v4.52.2
+ENV YQ_VERSION=v4.52.4
 RUN curl -Lo /usr/local/bin/yq "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_$TARGETARCH" && \
   chmod +x /usr/local/bin/yq && \
   yq --version
 
 # https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
 # renovate: datasource=github-releases depName=kubectl packageName=kubernetes/kubernetes
-ENV KUBECTL_VERSION=v1.34.0
+ENV KUBECTL_VERSION=v1.35.2
 RUN curl -Lo /usr/local/bin/kubectl "https://dl.k8s.io/release/$KUBECTL_VERSION/bin/linux/$TARGETARCH/kubectl" && \
   chmod +x /usr/local/bin/kubectl && \
   kubectl version --client=true
@@ -97,7 +97,7 @@ RUN curl -L "https://get.helm.sh/helm-$HELM_VERSION-linux-$TARGETARCH.tar.gz" \
 
 # https://github.com/fullstorydev/grpcurl/releases
 # renovate: datasource=github-releases depName=grpcurl packageName=fullstorydev/grpcurl
-ENV GRPCURL_VERSION=v1.9.2
+ENV GRPCURL_VERSION=v1.9.3
 RUN GRPCURL_ARCH=$([ "${TARGETARCH}" = "amd64" ] && echo "x86_64" || echo "${TARGETARCH}") && \
   curl -L "https://github.com/fullstorydev/grpcurl/releases/download/${GRPCURL_VERSION}/grpcurl_${GRPCURL_VERSION#v}_linux_${GRPCURL_ARCH}.tar.gz" \
   | tar -zxvf - -C /usr/local/bin grpcurl && \
