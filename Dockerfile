@@ -62,7 +62,7 @@ RUN curl -L "https://download.docker.com/linux/static/stable/$(uname -m)/docker-
 
 # https://github.com/aws/aws-cli/tags
 # renovate: datasource=github-tags depName=aws-cli packageName=aws/aws-cli
-ENV AWS_CLI_VERSION=2.33.31
+ENV AWS_CLI_VERSION=2.34.0
 RUN curl -lo awscliv2.zip "https://awscli.amazonaws.com/awscli-exe-linux-$(uname -m)-${AWS_CLI_VERSION}.zip" && \
   unzip -q awscliv2.zip && \
   ./aws/install && \
@@ -71,7 +71,7 @@ RUN curl -lo awscliv2.zip "https://awscli.amazonaws.com/awscli-exe-linux-$(uname
 
 # https://github.com/hatoo/oha/releases
 # renovate: datasource=github-releases depName=oha packageName=hatoo/oha versioning=semver-coerced
-ENV OHA_VERSION=v1.13.0
+ENV OHA_VERSION=v1.14.0
 RUN curl -Lo /usr/local/bin/oha "https://github.com/hatoo/oha/releases/download/${OHA_VERSION}/oha-linux-${TARGETARCH}" && \
   chmod +x /usr/local/bin/oha && \
   oha --version
