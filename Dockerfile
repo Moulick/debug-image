@@ -114,3 +114,12 @@ RUN curl -L "https://github.com/kubernetes-sigs/kustomize/releases/download/kust
   | tar -zxvf - -C /usr/local/bin kustomize && \
   chmod +x /usr/local/bin/kustomize && \
   kustomize version
+
+# https://github.com/lovromazgon/impromptu/releases
+# renovate: datasource=github-releases depName=impromptu packageName=lovromazgon/impromptu
+ENV IMPROMPTU_VERSION=v0.1.3
+RUN IMPROMPTU_ARCH=$([ "${TARGETARCH}" = "amd64" ] && echo "x86_64" || echo "${TARGETARCH}") && \
+  curl -L "https://github.com/lovromazgon/impromptu/releases/download/${IMPROMPTU_VERSION}/impromptu_${IMPROMPTU_VERSION#v}_Linux_${IMPROMPTU_ARCH}.tar.gz" \
+  | tar -zxvf - -C /usr/local/bin impromptu && \
+  chmod +x /usr/local/bin/impromptu && \
+  impromptu --version
