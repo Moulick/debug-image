@@ -28,7 +28,6 @@ RUN apt-get update && \
   iputils-ping \
   nano \
   redis-tools \
-  iputils-ping \
   screen \
   rsync \
   python3 \
@@ -48,6 +47,9 @@ RUN apt-get update && \
   kafkacat \
   net-tools \
   nmap \
+  iproute2 \
+  iputils-tracepath \
+  traceroute \
   && \
   apt-get clean && rm -rf /tmp/* /var/tmp/* /var/lib/apt/lists/*
 
