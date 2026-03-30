@@ -58,13 +58,13 @@ RUN uv pip install --system --break-system-packages --no-cache-dir --upgrade s3c
 
 # https://download.docker.com/linux/static/stable/
 # renovate: datasource=docker depName=docker packageName=docker versioning=docker
-ENV DOCKER_VERSION=29.3.0
+ENV DOCKER_VERSION=29.3.1
 RUN curl -L "https://download.docker.com/linux/static/stable/$(uname -m)/docker-${DOCKER_VERSION}.tgz" \
   | tar -zxvf - --strip 1 -C /usr/bin docker/docker
 
 # https://github.com/aws/aws-cli/tags
 # renovate: datasource=github-tags depName=aws-cli packageName=aws/aws-cli
-ENV AWS_CLI_VERSION=2.34.15
+ENV AWS_CLI_VERSION=2.34.19
 RUN curl -lo awscliv2.zip "https://awscli.amazonaws.com/awscli-exe-linux-$(uname -m)-${AWS_CLI_VERSION}.zip" && \
   unzip -q awscliv2.zip && \
   ./aws/install && \
@@ -80,7 +80,7 @@ RUN curl -Lo /usr/local/bin/oha "https://github.com/hatoo/oha/releases/download/
 
 # https://github.com/mikefarah/yq/releases/
 # renovate: datasource=github-releases depName=yq packageName=mikefarah/yq
-ENV YQ_VERSION=v4.52.4
+ENV YQ_VERSION=v4.52.5
 RUN curl -Lo /usr/local/bin/yq "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_$TARGETARCH" && \
   chmod +x /usr/local/bin/yq && \
   yq --version
