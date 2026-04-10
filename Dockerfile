@@ -58,13 +58,13 @@ RUN uv pip install --system --break-system-packages --no-cache-dir --upgrade s3c
 
 # https://download.docker.com/linux/static/stable/
 # renovate: datasource=docker depName=docker packageName=docker versioning=docker
-ENV DOCKER_VERSION=29.3.1
+ENV DOCKER_VERSION=29.4.0
 RUN curl -L "https://download.docker.com/linux/static/stable/$(uname -m)/docker-${DOCKER_VERSION}.tgz" \
   | tar -zxvf - --strip 1 -C /usr/bin docker/docker
 
 # https://github.com/aws/aws-cli/tags
 # renovate: datasource=github-tags depName=aws-cli packageName=aws/aws-cli
-ENV AWS_CLI_VERSION=2.34.22
+ENV AWS_CLI_VERSION=2.34.28
 RUN curl -lo awscliv2.zip "https://awscli.amazonaws.com/awscli-exe-linux-$(uname -m)-${AWS_CLI_VERSION}.zip" && \
   unzip -q awscliv2.zip && \
   ./aws/install && \
@@ -94,7 +94,7 @@ RUN curl -Lo /usr/local/bin/kubectl "https://dl.k8s.io/release/$KUBECTL_VERSION/
 
 # https://github.com/helm/helm/releases
 # renovate: datasource=github-releases depName=helm packageName=helm/helm
-ENV HELM_VERSION=v4.1.3
+ENV HELM_VERSION=v4.1.4
 RUN curl -L "https://get.helm.sh/helm-$HELM_VERSION-linux-$TARGETARCH.tar.gz" \
   | tar -zxvf - --strip-components=1 -C /usr/local/bin linux-$TARGETARCH/helm && \
   chmod +x /usr/local/bin/helm && \
