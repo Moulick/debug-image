@@ -1,4 +1,4 @@
-FROM docker.io/library/ubuntu:noble
+FROM docker.io/library/ubuntu:resolute
 
 LABEL org.opencontainers.image.authors="moulickaggarwal"
 LABEL org.opencontainers.image.source="https://github.com/Moulick/debug-image"
