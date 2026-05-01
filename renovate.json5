@@ -16,7 +16,7 @@
         "aws/*{/,}**"
       ],
       "schedule": [
-        "* * 1,10,20,30 * *"
+        "0 16 * * TUE" // every Tuesday at 4PM CEST
       ]
     }
   ]
