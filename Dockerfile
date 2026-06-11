@@ -53,6 +53,8 @@ RUN apt-get update && \
   && \
   apt-get clean && rm -rf /tmp/* /var/tmp/* /var/lib/apt/lists/*
 
+COPY --chmod=0644 bashrc /root/.bashrc
+
 COPY --from=ghcr.io/astral-sh/uv:0.11 /uv /uvx /bin/
 RUN uv pip install --system --break-system-packages --no-cache-dir --upgrade s3cmd==2.4.0 python-magic
 
