@@ -53,6 +53,10 @@ urldecode() {
 kdebug() {
   local ns="${1:-$(def_cap)}"
   local istio="${2:-true}"
+  local service_account="${3:-}"
+  local overrides='[{"op":"replace", "path":"/spec/containers/0/resources/requests", "value":{"cpu": "300m", "memory": "512Mi"}}]'
+
+  [[ -n "$service_account" ]] && overrides='[{"op":"replace", "path":"/spec/containers/0/resources/requests", "value":{"cpu": "300m", "memory": "512Mi"}},{"op":"add", "path":"/spec/serviceAccountName", "value":"'"$service_account"'"}]'
 
   pod_status=$(kubectl get pods "$pod_name" -n "$ns" -o=jsonpath='{.status.phase}')
   if [[ "$pod_status" == "Running" ]]; then
@@ -63,7 +67,7 @@ kdebug() {
     kubectl delete pod "$pod_name" -n "$ns" --grace-period=0 --force --ignore-not-found
     kubectl run "$pod_name" -it \
       --labels="sidecar.istio.io/inject=$istio" \
-      --overrides='[{"op":"replace", "path":"/spec/containers/0/resources/requests", "value":{"cpu": "300m", "memory": "512Mi"}}]' \
+      --overrides="$overrides" \
       --override-type=json \
       --restart=Never \
       --image=moulick/debug-image:latest \
