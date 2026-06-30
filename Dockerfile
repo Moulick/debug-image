@@ -60,13 +60,13 @@ RUN uv pip install --system --break-system-packages --no-cache-dir --upgrade s3c
 
 # https://download.docker.com/linux/static/stable/
 # renovate: datasource=docker depName=docker packageName=docker versioning=docker
-ENV DOCKER_VERSION=29.4.1
+ENV DOCKER_VERSION=29.6.1
 RUN curl -L "https://download.docker.com/linux/static/stable/$(uname -m)/docker-${DOCKER_VERSION}.tgz" \
   | tar -zxvf - --strip 1 -C /usr/bin docker/docker
 
 # https://github.com/aws/aws-cli/tags
 # renovate: datasource=github-tags depName=aws-cli packageName=aws/aws-cli
-ENV AWS_CLI_VERSION=2.34.40
+ENV AWS_CLI_VERSION=2.35.13
 RUN curl -lo awscliv2.zip "https://awscli.amazonaws.com/awscli-exe-linux-$(uname -m)-${AWS_CLI_VERSION}.zip" && \
   unzip -q awscliv2.zip && \
   ./aws/install && \
@@ -82,21 +82,21 @@ RUN curl -Lo /usr/local/bin/oha "https://github.com/hatoo/oha/releases/download/
 
 # https://github.com/mikefarah/yq/releases/
 # renovate: datasource=github-releases depName=yq packageName=mikefarah/yq
-ENV YQ_VERSION=v4.53.2
+ENV YQ_VERSION=v4.53.3
 RUN curl -Lo /usr/local/bin/yq "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_$TARGETARCH" && \
   chmod +x /usr/local/bin/yq && \
   yq --version
 
 # https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
 # renovate: datasource=github-releases depName=kubectl packageName=kubernetes/kubernetes
-ENV KUBECTL_VERSION=v1.36.0
+ENV KUBECTL_VERSION=v1.36.2
 RUN curl -Lo /usr/local/bin/kubectl "https://dl.k8s.io/release/$KUBECTL_VERSION/bin/linux/$TARGETARCH/kubectl" && \
   chmod +x /usr/local/bin/kubectl && \
   kubectl version --client=true
 
 # https://github.com/helm/helm/releases
 # renovate: datasource=github-releases depName=helm packageName=helm/helm
-ENV HELM_VERSION=v4.1.4
+ENV HELM_VERSION=v4.2.2
 RUN curl -L "https://get.helm.sh/helm-$HELM_VERSION-linux-$TARGETARCH.tar.gz" \
   | tar -zxvf - --strip-components=1 -C /usr/local/bin linux-$TARGETARCH/helm && \
   chmod +x /usr/local/bin/helm && \
