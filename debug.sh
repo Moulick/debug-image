@@ -53,7 +53,8 @@ urldecode() {
 kdebug() {
   local ns="${1:-$(def_cap)}"
   local istio="${2:-true}"
-  local service_account="${3:-}"
+  local image="${3:-moulick/debug-image:latest}"
+  local service_account="${4:-}"
   local overrides='[{"op":"replace", "path":"/spec/containers/0/resources/requests", "value":{"cpu": "300m", "memory": "512Mi"}}]'
 
   [[ -n "$service_account" ]] && overrides='[{"op":"replace", "path":"/spec/containers/0/resources/requests", "value":{"cpu": "300m", "memory": "512Mi"}},{"op":"add", "path":"/spec/serviceAccountName", "value":"'"$service_account"'"}]'
@@ -70,7 +71,7 @@ kdebug() {
       --overrides="$overrides" \
       --override-type=json \
       --restart=Never \
-      --image=moulick/debug-image:latest \
+      --image="$image" \
       --namespace "$ns" \
       -- bash
   fi
