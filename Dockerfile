@@ -1,3 +1,43 @@
+FROM docker.io/library/ubuntu:noble AS kcat-builder
+
+ENV DEBIAN_FRONTEND="noninteractive"
+
+# https://github.com/edenhill/kcat/tags
+# renovate: datasource=github-tags depName=kcat packageName=edenhill/kcat
+ARG KCAT_VERSION=1.7.1
+# https://github.com/confluentinc/libserdes/tags
+# renovate: datasource=github-tags depName=libserdes packageName=confluentinc/libserdes
+ARG LIBSERDES_VERSION=v8.3.0
+
+RUN apt-get update && \
+  apt-get install -y --no-install-recommends \
+  ca-certificates \
+  cmake \
+  curl \
+  g++ \
+  gcc \
+  libcurl4-openssl-dev \
+  liblz4-dev \
+  libsasl2-dev \
+  libssl-dev \
+  libzstd-dev \
+  make \
+  perl \
+  pkg-config \
+  python3 \
+  zlib1g-dev \
+  && \
+  mkdir -p /tmp/kcat-build && \
+  curl -fsSL "https://github.com/edenhill/kcat/archive/refs/tags/${KCAT_VERSION}.tar.gz" \
+  | tar -xz -C /tmp/kcat-build --strip-components=1 && \
+  cd /tmp/kcat-build && \
+  sed -i "s|github_download \"confluentinc/libserdes\" \"master\"|github_download \"confluentinc/libserdes\" \"${LIBSERDES_VERSION}\"|" bootstrap.sh && \
+  grep -F "github_download \"confluentinc/libserdes\" \"${LIBSERDES_VERSION}\"" bootstrap.sh && \
+  ./bootstrap.sh --no-install-deps && \
+  install -m 0755 kcat /usr/local/bin/kcat && \
+  /usr/local/bin/kcat -V && \
+  apt-get clean && rm -rf /tmp/* /var/tmp/* /var/lib/apt/lists/*
+
 FROM docker.io/library/ubuntu:noble
 
 LABEL org.opencontainers.image.authors="moulickaggarwal"
@@ -44,7 +84,7 @@ RUN apt-get update && \
   parallel \
   ssh \
   iptables \
-  kafkacat \
+  libsasl2-2 \
   net-tools \
   nmap \
   iproute2 \
@@ -54,6 +94,11 @@ RUN apt-get update && \
   apt-get clean && rm -rf /tmp/* /var/tmp/* /var/lib/apt/lists/*
 
 COPY --chmod=0644 bashrc /root/.bashrc
+
+COPY --from=kcat-builder /usr/local/bin/kcat /usr/local/bin/kcat
+RUN ln -sf /usr/local/bin/kcat /usr/local/bin/kafkacat && \
+  kcat -V && \
+  kafkacat -V
 
 COPY --from=ghcr.io/astral-sh/uv:0.11 /uv /uvx /bin/
 RUN uv pip install --system --break-system-packages --no-cache-dir --upgrade s3cmd==2.4.0 python-magic
