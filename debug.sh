@@ -55,9 +55,37 @@ kdebug() {
   local istio="${2:-true}"
   local image="${3:-moulick/debug-image:latest}"
   local service_account="${4:-}"
-  local overrides='[{"op":"replace", "path":"/spec/containers/0/resources/requests", "value":{"cpu": "300m", "memory": "512Mi"}}]'
+  local overrides
 
-  [[ -n "$service_account" ]] && overrides='[{"op":"replace", "path":"/spec/containers/0/resources/requests", "value":{"cpu": "300m", "memory": "512Mi"}},{"op":"add", "path":"/spec/serviceAccountName", "value":"'"$service_account"'"}]'
+  overrides=$(
+    jq -cn --arg service_account "$service_account" '
+      [
+        {
+          "op": "add",
+          "path": "/metadata/annotations",
+          "value": {"karpenter.sh/do-not-disrupt": "true"}
+        },
+        {
+          "op": "replace",
+          "path": "/spec/containers/0/resources/requests",
+          "value": {"cpu": "300m", "memory": "512Mi"}
+        }
+      ]
+      + (
+        if $service_account == "" then
+          []
+        else
+          [
+            {
+              "op": "add",
+              "path": "/spec/serviceAccountName",
+              "value": $service_account
+            }
+          ]
+        end
+      )
+    '
+  )
 
   pod_status=$(kubectl get pods "$pod_name" -n "$ns" -o=jsonpath='{.status.phase}')
   if [[ "$pod_status" == "Running" ]]; then
