@@ -69,6 +69,11 @@ kdebug() {
           "op": "replace",
           "path": "/spec/containers/0/resources/requests",
           "value": {"cpu": "300m", "memory": "512Mi"}
+        },
+        {
+          "op": "add",
+          "path": "/spec/nodeSelector",
+          "value": {"karpenter.sh/capacity-type": "on-demand"}
         }
       ]
       + (
