@@ -7,7 +7,7 @@ ENV DEBIAN_FRONTEND="noninteractive"
 ARG KCAT_VERSION=1.7.1
 # https://github.com/confluentinc/libserdes/tags
 # renovate: datasource=github-tags depName=libserdes packageName=confluentinc/libserdes
-ARG LIBSERDES_VERSION=v8.3.0
+ARG LIBSERDES_VERSION=v8.3.1
 
 RUN apt-get update && \
   apt-get install -y --no-install-recommends \
@@ -100,18 +100,18 @@ RUN ln -sf /usr/local/bin/kcat /usr/local/bin/kafkacat && \
   kcat -V && \
   kafkacat -V
 
-COPY --from=ghcr.io/astral-sh/uv:0.11 /uv /uvx /bin/
+COPY --from=ghcr.io/astral-sh/uv:0.12 /uv /uvx /bin/
 RUN uv pip install --system --break-system-packages --no-cache-dir --upgrade s3cmd==2.4.0 python-magic
 
 # https://download.docker.com/linux/static/stable/
 # renovate: datasource=docker depName=docker packageName=docker versioning=docker
-ENV DOCKER_VERSION=29.6.1
+ENV DOCKER_VERSION=29.8.0
 RUN curl -L "https://download.docker.com/linux/static/stable/$(uname -m)/docker-${DOCKER_VERSION}.tgz" \
   | tar -zxvf - --strip 1 -C /usr/bin docker/docker
 
 # https://github.com/aws/aws-cli/tags
 # renovate: datasource=github-tags depName=aws-cli packageName=aws/aws-cli
-ENV AWS_CLI_VERSION=2.35.13
+ENV AWS_CLI_VERSION=2.36.41
 RUN curl -lo awscliv2.zip "https://awscli.amazonaws.com/awscli-exe-linux-$(uname -m)-${AWS_CLI_VERSION}.zip" && \
   unzip -q awscliv2.zip && \
   ./aws/install && \
@@ -120,28 +120,28 @@ RUN curl -lo awscliv2.zip "https://awscli.amazonaws.com/awscli-exe-linux-$(uname
 
 # https://github.com/hatoo/oha/releases
 # renovate: datasource=github-releases depName=oha packageName=hatoo/oha versioning=semver-coerced
-ENV OHA_VERSION=v1.14.0
+ENV OHA_VERSION=v1.16.0
 RUN curl -Lo /usr/local/bin/oha "https://github.com/hatoo/oha/releases/download/${OHA_VERSION}/oha-linux-${TARGETARCH}" && \
   chmod +x /usr/local/bin/oha && \
   oha --version
 
 # https://github.com/mikefarah/yq/releases/
 # renovate: datasource=github-releases depName=yq packageName=mikefarah/yq
-ENV YQ_VERSION=v4.53.3
+ENV YQ_VERSION=v4.53.6
 RUN curl -Lo /usr/local/bin/yq "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_$TARGETARCH" && \
   chmod +x /usr/local/bin/yq && \
   yq --version
 
 # https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
 # renovate: datasource=github-releases depName=kubectl packageName=kubernetes/kubernetes
-ENV KUBECTL_VERSION=v1.36.2
+ENV KUBECTL_VERSION=v1.37.0
 RUN curl -Lo /usr/local/bin/kubectl "https://dl.k8s.io/release/$KUBECTL_VERSION/bin/linux/$TARGETARCH/kubectl" && \
   chmod +x /usr/local/bin/kubectl && \
   kubectl version --client=true
 
 # https://github.com/helm/helm/releases
 # renovate: datasource=github-releases depName=helm packageName=helm/helm
-ENV HELM_VERSION=v4.2.2
+ENV HELM_VERSION=v4.2.4
 RUN curl -L "https://get.helm.sh/helm-$HELM_VERSION-linux-$TARGETARCH.tar.gz" \
   | tar -zxvf - --strip-components=1 -C /usr/local/bin linux-$TARGETARCH/helm && \
   chmod +x /usr/local/bin/helm && \
@@ -149,7 +149,7 @@ RUN curl -L "https://get.helm.sh/helm-$HELM_VERSION-linux-$TARGETARCH.tar.gz" \
 
 # https://github.com/fullstorydev/grpcurl/releases
 # renovate: datasource=github-releases depName=grpcurl packageName=fullstorydev/grpcurl
-ENV GRPCURL_VERSION=v1.9.3
+ENV GRPCURL_VERSION=v1.9.4
 RUN GRPCURL_ARCH=$([ "${TARGETARCH}" = "amd64" ] && echo "x86_64" || echo "${TARGETARCH}") && \
   curl -L "https://github.com/fullstorydev/grpcurl/releases/download/${GRPCURL_VERSION}/grpcurl_${GRPCURL_VERSION#v}_linux_${GRPCURL_ARCH}.tar.gz" \
   | tar -zxvf - -C /usr/local/bin grpcurl && \
